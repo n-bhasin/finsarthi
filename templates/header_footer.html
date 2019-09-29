@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}
+    Home
+{% endblock %}
+{% block navbar %}
+    <div class="col-md-12 m0 p0">
+        <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+            <!-- Brand/logo -->
+            <div class="col-md-2">
+                <a class="navbar-brand" href="#">{{ user|title }}</a>
+            </div>
+
+            <!-- Links -->
+            <div class="col-md-10">
+                <button class="navbar-toggler" type="button" data-toggle="collapse"
+                        data-target="#collapsibleNavbar">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="collapsibleNavbar">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Campaign</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Link</a>
+                        </li>
+                        <li class="nav-item" style="float: right!important;">
+                            <a class="nav-link" href="{% url 'logout_view' %}">Log Out</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </nav>
+    </div>
+    <div class="container">
+        <div class="col-md-12 mt-30">
+            <h1 class="">Campaigns</h1>
+            <hr>
+        </div>
+        {% block content %}{% endblock %}
+    </div>
+{% endblock %}
