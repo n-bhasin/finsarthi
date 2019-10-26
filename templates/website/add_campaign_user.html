@@ -20,18 +20,19 @@
             <li class="nav-item">
                 <a class="nav-link" href="detail_campaign">Campaigns</a>
             </li>
-            {% if request.user.first_name != 'Admin' %}
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#user_detail">User</a>
-                </li>
-
-            {% endif %}
-            {% if request.user.first_name == 'Admin' %}
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#user">Add User</a>
-                </li>
-            {% endif %}
-
+{#            {% if request.user.first_name != 'Admin' %}#}
+{##}
+{#            {% endif %}#}
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#user_detail">User</a>
+            </li>
+{##}
+{#            {% if request.user.first_name == 'Admin' %}#}
+{##}
+{#            {% endif %}#}
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#user">Add User</a>
+            </li>
 
             <li class="nav-item ">
                 <a class="nav-link" href="browse_prospects">Browse Prospect</a>
@@ -64,9 +65,6 @@
 
                 </div>
 
-                {#                <div class="col-md-12">#}
-                {#                    {% for i in camp_fetch %}{{ i.camp_user.first_name }}{% endfor %}#}
-                {#                </div>#}
             </div>
             <div id="user" class="container tab-pane active "><br>
                 <h3>Campaign Users</h3>

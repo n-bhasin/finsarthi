@@ -21,23 +21,23 @@
             </li>
 
             {% if request.user.first_name != 'Admin' %}
-                <li class="nav-item">
-                    <a class="nav-link" href="user_detail">User</a>
-                </li>
 
             {% endif %}
+            <li class="nav-item">
+                <a class="nav-link" href="user_detail">User</a>
+            </li>
 
             {% if request.user.first_name == 'Admin' %}
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#user">Add User</a>
-                </li>
             {% endif %}
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#user">Add User</a>
+            </li>
 
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">Prospect</a>
                 <div class="dropdown-menu">
                     <a class="dropdown-item" data-toggle="tab" href="#browse">Browse</a>
-                    <a class="dropdown-item" d  ata-toggle="tab" href="#">Add New</a>
+                    <a class="dropdown-item" d ata-toggle="tab" href="#">Add New</a>
                     <a class="dropdown-item" data-toggle="tab" href="#prospect">Import</a>
                 </div>
             </li>
@@ -57,7 +57,7 @@
                                 <th>Username</th>
                                 <th>Email</th>
                                 <th>Active</th>
-{#                                <th>Action</th>#}
+                                {#                                <th>Action</th>#}
                             </tr>
                             {% for ud in user_id.camp_user.values %}
                                 <tr>
@@ -66,11 +66,11 @@
                                     <td>{{ ud.username }}</td>
                                     <td>{{ ud.email }}</td>
                                     <td>{{ ud.is_active }}</td>
-{#                                    <td>#}
-{#                                        <a href="/{{ ud.id }}/edit">#}
-{#                                            <button type="submit" class="btn btn-danger">Edit</button>#}
-{#                                        </a>#}
-{#                                    </td>#}
+                                    {#                                    <td>#}
+                                    {#                                        <a href="/{{ ud.id }}/edit">#}
+                                    {#                                            <button type="submit" class="btn btn-danger">Edit</button>#}
+                                    {#                                        </a>#}
+                                    {#                                    </td>#}
                                 </tr>
                             {% endfor %}
 

@@ -22,17 +22,18 @@
                 <a class="nav-link" href="detail_campaign">Campaigns</a>
             </li>
             {% if request.user.first_name != 'Admin' %}
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#user_detail">User</a>
-                </li>
+
 
             {% endif %}
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#user_detail">User</a>
+            </li>
             {% if request.user.first_name == 'Admin' %}
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#user">Add User</a>
-                </li>
-            {% endif %}
 
+            {% endif %}
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#user">Add User</a>
+            </li>
 
             <li class="nav-item">
                 <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">Prospect</a>

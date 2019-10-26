@@ -78,18 +78,17 @@ def home(request):
 @login_required(login_url=login_view)
 def add_employee(request):
 	context = {}
-	if request.user.first_name == 'Admin':
-		employee_form = EmployeeForm(request.POST or None)
 
-		if employee_form.is_valid():
-			employee_form.save()
-			messages.success(request, "User is Added")
-			return HttpResponseRedirect(reverse('add_employee'))
-		context['employee_form'] = employee_form
-		context['users'] = User.objects.order_by("id").all()
-		return render(request, 'website/add_employee.html', context)
-	messages.error(request, "You are not authorized.")
-	return HttpResponseRedirect(reverse('home'))
+	employee_form = EmployeeForm(request.POST or None)
+
+	if employee_form.is_valid():
+		employee_form.save()
+		messages.success(request, "User is Added")
+		return HttpResponseRedirect(reverse('add_employee'))
+
+	context['employee_form'] = employee_form
+	context['users'] = User.objects.order_by("id").all()
+	return render(request, 'website/add_employee.html', context)
 
 
 @login_required(login_url=login_view)
@@ -112,18 +111,15 @@ def edit(request, id):
 @login_required(login_url=login_view)
 def delete(request, id):
 	context = {}
-	if request.user.first_name == 'Admin':
-		employee = get_object_or_404(User, id=id)
-		if request.method == 'POST':
-			employee.delete()
-			messages.success(request, "User is deleted.")
-			return HttpResponseRedirect(reverse('add_employee'))
-		else:
-			messages.error(request, "User is deleted.")
-			context['employee'] = employee
-			return render(request, 'website/delete.html', context)
-	messages.error(request, "You are not authorized.")
-	return HttpResponseRedirect(reverse('home'))
+	employee = get_object_or_404(User, id=id)
+	if request.method == 'POST':
+		employee.delete()
+		messages.success(request, "User is deleted.")
+		return HttpResponseRedirect(reverse('add_employee'))
+	else:
+		messages.error(request, "User is deleted.")
+		context['employee'] = employee
+		return render(request, 'website/delete.html', context)
 
 
 # @role_required(allowed_roles=['Admin', ])
@@ -131,20 +127,18 @@ def delete(request, id):
 def create_campaign(request):
 	context = {}
 	# print(request.user.groups.values().get())
-	if request.user.first_name == 'Admin':
-		campaign_form = Campaign(request.POST or None)
 
-		if campaign_form.is_valid():
-			print('yes')
-			campaign_form.save()
-			messages.success(request, "Campaign is created.")
-			return HttpResponseRedirect(reverse(home))
+	campaign_form = Campaign(request.POST or None)
 
-		context['campaign_form'] = campaign_form
-		messages.error(request, "Fill the details again.")
-		return render(request, 'website/campaign.html', context)
-	messages.error(request, "You are not authorized.")
-	return HttpResponseRedirect(reverse('home'))
+	if campaign_form.is_valid():
+		print('yes')
+		campaign_form.save()
+		messages.success(request, "Campaign is created.")
+		return HttpResponseRedirect(reverse(home))
+
+	context['campaign_form'] = campaign_form
+	messages.error(request, "Fill the details again.")
+	return render(request, 'website/campaign.html', context)
 
 
 @login_required(login_url=login_view)
@@ -163,56 +157,51 @@ def detail_campaign(request, id):
 @login_required(login_url=login_view)
 def add_campaign_user(request, id):
 	context = {}
-	if request.user.first_name == 'Admin':
-		camp_id = get_object_or_404(NewCampaign, id=id)
-		camp_user = CampaignUser(request.POST, instance=camp_id)
-		if request.method == 'POST':
-			if camp_user.is_valid():
-				camp_user.save()
-				messages.success(request, "User is added.")
-				return HttpResponseRedirect(reverse('detail_campaign', args=[camp_id.id, ]))
-		else:
-			cu = CampaignUser(instance=camp_id)
-			context['camp_user'] = cu
-			context['camp_id'] = camp_id
-			return render(request, 'website/add_campaign_user.html', context)
-	return render(request, 'website/home.html', context)
+
+	camp_id = get_object_or_404(NewCampaign, id=id)
+	camp_user = CampaignUser(request.POST, instance=camp_id)
+	if request.method == 'POST':
+		if camp_user.is_valid():
+			camp_user.save()
+			messages.success(request, "User is added.")
+			return HttpResponseRedirect(reverse('detail_campaign', args=[camp_id.id, ]))
+	else:
+		cu = CampaignUser(instance=camp_id)
+		context['camp_user'] = cu
+		context['camp_id'] = camp_id
+		return render(request, 'website/add_campaign_user.html', context)
 
 
 @login_required(login_url=login_view)
 def edit_camp(request, id):
 	cid = get_object_or_404(NewCampaign, id=id)
 	print(cid)
-	if request.user.first_name == 'Admin':
-		if request.method == 'POST':
-			campaign_form = Campaign(request.POST, instance=cid)
-			if campaign_form.is_valid():
-				campaign_form.save()
-				messages.success(request, 'Changes are done successfully.')
-				return HttpResponseRedirect(reverse('detail_campaign', args=[cid.id, ]))
-			else:
-				messages.error(request, 'Failed.')
+
+	if request.method == 'POST':
+		campaign_form = Campaign(request.POST, instance=cid)
+		if campaign_form.is_valid():
+			campaign_form.save()
+			messages.success(request, 'Changes are done successfully.')
+			return HttpResponseRedirect(reverse('detail_campaign', args=[cid.id, ]))
 		else:
-			campaign_form = Campaign(instance=cid)
-			return render(request, 'website/edit_camp.html', {'campaign_form': campaign_form})
-	messages.error(request, "You are not authorized.")
-	return HttpResponseRedirect(reverse('home'))
+			messages.error(request, 'Failed.')
+	else:
+		campaign_form = Campaign(instance=cid)
+		return render(request, 'website/edit_camp.html', {'campaign_form': campaign_form})
 
 
 @login_required(login_url=login_view)
 def delete_camp(request, id):
 	cid = get_object_or_404(NewCampaign, id=id)
 	print(cid)
-	if request.user.first_name == 'Admin':
-		if request.method == 'POST':
-			cid.delete()
-			messages.success(request, 'Campaign is deleted.')
-			return HttpResponseRedirect(reverse('home'))
-		else:
-			print('no')
-			return render(request, 'website/delete_camp.html', {'campaign_form': cid})
-	messages.error(request, "You are not authorized.")
-	return HttpResponseRedirect(reverse('home'))
+
+	if request.method == 'POST':
+		cid.delete()
+		messages.success(request, 'Campaign is deleted.')
+		return HttpResponseRedirect(reverse('home'))
+	else:
+		print('no')
+		return render(request, 'website/delete_camp.html', {'campaign_form': cid})
 
 
 @login_required(login_url=login_view)
