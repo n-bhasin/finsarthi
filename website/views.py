@@ -16,12 +16,6 @@ doc_fetch = Documents.objects.order_by('id').all()
 
 
 # confirm session view
-def form_view(request):
-	if request.session.has_key('user_session'):
-		# user = request.session['user_session']
-		return HttpResponseRedirect(reverse('home'))
-	else:
-		return render(request, 'website/login.html', {})
 
 
 # user login view
@@ -49,6 +43,14 @@ def login_view(request):
 
 	context['form'] = form
 	return render(request, template, context)
+
+
+def form_view(request):
+	if request.session.has_key('user_session'):
+		# user = request.session['user_session']
+		return HttpResponseRedirect(reverse('home'))
+	else:
+		return HttpResponseRedirect(reverse('login_view'))
 
 
 # logout view
