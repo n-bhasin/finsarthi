@@ -1,9 +1,7 @@
 import os
 
-from django import forms
 from django.db import models
 from django.contrib.auth.models import User, Group
-from phone_field import PhoneField
 
 
 # Create your models here.
