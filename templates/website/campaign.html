@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Create Campaign{% endblock %}
+{% block campaignheading %}New Campaign{% endblock %}
+{% block content %}
+    {% if messages %}
+        {% for message in messages %}
+            {{ message|title }}
+
+        {% endfor %}
+    {% endif %}
+    <form action="{% url 'create_campaign' %}" method="post">
+        {% csrf_token %}
+        {% for u in campaign_form %}
+            <div class="form-group field">
+                <label for="{{ u.id_for_label }}"
+                       class="label">{{ u.label|title }}</label>
+                {{ u }}
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Create</button>
+    </form>
+{% endblock %}

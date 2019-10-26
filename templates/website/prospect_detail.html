@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block campaignheading %}
+    {{ contact.name|title }}
+{% endblock %}
+{% block content %}
+    <div class="col-md-12">
+        <h5>Contact Details</h5>
+        <p><button type="button" class="btn btn-primary">{{ contact.phone_number }}</button>
+
+        </p>
+    </div>
+    <hr>
+    <div class="col-md-12">
+        <form method="post" action="">
+            {% csrf_token %}
+
+            <h5>Email</h5>
+            <div class="form-group">
+                <input type="email" class="form-control" name="email" id="exampleInputEmail1" aria-describedby="emailHelp"
+                       placeholder="Enter email">
+            </div>
+            <br>
+            <h5>Disposition</h5>
+            <div class="form-check">
+
+                <input class="form-check-input" type="radio" name="disposition" id="exampleRadios1" value="callback">
+                <label class="form-check-label" for="exampleRadios1">
+                    Call Back
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="disposition" id="exampleRadios1"
+                       value="notinterested">
+                <label class="form-check-label" for="exampleRadios1">
+                    Not Interested
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="disposition" id="exampleRadios1" value="noteligible">
+                <label class="form-check-label" for="exampleRadios1">
+                    Not Eligible
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="disposition" id="exampleRadios1" value="notreachable">
+                <label class="form-check-label" for="exampleRadios1">
+                    Not reachable
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="disposition" id="exampleRadios1" value="Interested">
+                <label class="form-check-label" for="exampleRadios1">
+                    Interested
+                </label>
+            </div>
+            <br>
+            <h5>Remarks</h5>
+            <div class="form-group">
+                <textarea class="form-control" name="remarks" id="exampleFormControlTextarea1" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+
+    </div>
+
+{% endblock %}

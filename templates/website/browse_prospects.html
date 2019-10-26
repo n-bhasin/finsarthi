@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block title %}Add Employees{% endblock %}
+{% block campaignheading %}{{ camp_fetch.name }}{% endblock %}
+{% block content %}
+
+    <!-- notification bar-->
+    <div class="col-md-12">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="col-sm-3 fade show alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    {{ message|title }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Nav tabs -->
+    <div class="col-md-12">
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link" href="detail_campaign">Campaigns</a>
+            </li>
+            {% if request.user.first_name != 'Admin' %}
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#user_detail">User</a>
+                </li>
+
+            {% endif %}
+            {% if request.user.first_name == 'Admin' %}
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#user">Add User</a>
+                </li>
+            {% endif %}
+
+
+            <li class="nav-item">
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">Prospect</a>
+
+            </li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+
+            <div id="user" class="container tab-pane active "><br>
+                <h5>Displaying all {{ fetch_data.count }} contact</h5>
+                <hr>
+                <div class="col-md-12">
+                    <div class="col-md-12">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th>Remarks</th>
+                            </tr>
+                            {% for ud in fetch_data %}
+
+                                <tr>
+
+                                    <td><a href="/{{ ud.id }}/prospect_detail">{{ ud.name|title }}</a></td>
+                                    <td>{{ ud.phone_number }}</td>
+                                    <td>{{ ud.email|title }}</td>
+                                    <td>{{ ud.status|title }}</td>
+                                    <td>{{ ud.remarks|title }}</td>
+
+                                </tr>
+                            {% endfor %}
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

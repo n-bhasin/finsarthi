@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}Add Employees{% endblock %}
+{% block campaignheading %}Users{% endblock %}
+{% block content %}
+    <div class="col-md-12">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="col-sm-3 fade show alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    {{ message|title }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+    <div class="col-md-12">
+        <button data-toggle="collapse" data-target="#demo" class="btn btn-primary">ADD USER</button>
+        <br>
+        <hr>
+        <div id="demo" class="collapse">
+            <form action="" method="post">
+                {% csrf_token %}
+                {% for user_fields in employee_form %}
+                    <div class="form-group field">
+                        <label for="{{ user_fields.id_for_label }}"
+                               class="label">{{ user_fields.label|title }}</label>
+                        {{ user_fields }}
+
+                        {% if user_fields.help_text %}
+                            <p class="help">{{ field.help_text }}</p>
+                        {% endif %}
+
+                        {% for error in user_fields.errors %}
+                            <p class="help text-danger">{{ error }}</p>
+                        {% endfor %}
+
+                    </div>
+                {% endfor %}
+                <button type="submit" name="submit" class="btn btn-primary">SAVE</button>
+                <br>
+                <hr>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-md-12">
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Last Login</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {% for user in users %}
+                <tr>
+
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.first_name }}</td>
+                    <td>{{ user.last_name }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{% for name in user.groups.values %}{{ name.name }}&nbsp;{% endfor %}</td>
+                    <td>{{ user.last_login }}</td>
+
+                    <td><a href="{{ user.id }}/edit">
+                        <button type="submit" class="btn btn-primary">Edit</button>
+                    </a>
+                        <a href="{{ user.id }}/delete">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </a>
+                    </td>
+                </tr>
+
+            {% endfor %}
+        </table>
+    </div>
+
+{% endblock %}

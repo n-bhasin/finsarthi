@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block campaignheading %}Users{% endblock %}
+{% block content %}
+    <form action="" method="post">
+        {% csrf_token %}
+        {% for u in employee_form %}
+            <div class="form-group field">
+                <label for="{{ u.id_for_label }}"
+                       class="label">{{ u.label|title }}</label>
+                {{ u }}
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">edit</button>
+    </form>
+
+{% endblock %}

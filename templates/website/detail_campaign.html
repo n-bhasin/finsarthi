@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}Campaign Detail{% endblock %}
+{% block campaignheading %}{{ camp_detail.name }}{% endblock %}
+{% block content %}
+
+    <div class="col-md-12">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="col-sm-3 fade show alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    {{ message|title }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Nav tabs -->
+    <div class="col-md-12">
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'home' %}">Campaigns</a>
+            </li>
+            {% if request.user.first_name != 'Admin' %}
+                <li class="nav-item">
+                    <a class="nav-link" href="user_detail">User</a>
+                </li>
+
+            {% endif %}
+            {% if request.user.first_name == 'Admin' %}
+                <li class="nav-item">
+                    <a class="nav-link" href="add_campaign_user">Add User</a>
+                </li>
+            {% endif %}
+            <li class="nav-item dropdown">
+                <a class="nav-link" href="browse_prospects">Browse Prospects</a>
+{#                <div class="dropdown-menu">#}
+{#                    <a class="dropdown-item" data-toggle="tab" href="#browse">Browse</a>#}
+{#                    <a class="dropdown-item" data-toggle="tab" href="#">Add New</a>#}
+{#                    <a class="dropdown-item" href="prospect">Import</a>#}
+{#                </div>#}
+            </li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div id="home" class="container tab-pane active"><br>
+                <h6>Detail</h6>
+                <hr>
+                <div class="col-md-12">
+
+                    <strong>Script</strong>
+                    <p>{{ camp_detail.script }}</p>
+                    <strong>Assigned</strong>
+                    <p>{% for n in camp_detail.assign_to.all %}{{ n }},{% endfor %}</p>
+                    <strong>Date</strong>
+                    <p>{{ camp_detail.date }}</p>
+                    <strong>Member</strong>
+                    <p>{% for n in camp_detail.camp_user.all %}{{ n }},{% endfor %}</p>
+                    {% if user.groups.values.get.name == 'Admin' %}
+                        <a href="edit_camp">
+                            <button type="submit" class="btn btn-primary">Edit</button>
+                        </a>
+                        <a href="delete_camp">
+
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </a>
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}

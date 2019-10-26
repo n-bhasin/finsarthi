@@ -23,11 +23,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '(h+a)lbpzv9%b)r#u$3zv$=)^o0-%ob=299$vchku=m6$@jx-%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['finsarthi.herokuapp.com', '127.0.0.1']
 
-# Application definitiongit
+# Application definition
 
 INSTALLED_APPS = [
 	'website.apps.WebsiteConfig',
@@ -59,6 +59,7 @@ TEMPLATES = [
 		'APP_DIRS': True,
 		'OPTIONS': {
 			'context_processors': [
+				'django.template.context_processors.media',
 				'django.template.context_processors.debug',
 				'django.template.context_processors.request',
 				'django.contrib.auth.context_processors.auth',
@@ -76,10 +77,10 @@ WSGI_APPLICATION = 'tele_caller.wsgi.application'
 DATABASES = {
 	'default': {
 		'ENGINE': 'django.db.backends.postgresql',
-		'NAME': 'ytdfcvfp',
-		'USER': 'ytdfcvfp',
-		'PASSWORD': 'uVUIyiIrrkcgOrNVqcXZaGsAybpxsMyc',
-		'HOST': 'hansken.db.elephantsql.com',
+		'NAME': 'jkjxdbsd',
+		'USER': 'jkjxdbsd',
+		'PASSWORD': 'QXZUEL1d8tDtb-05UOeVMhnO0xruHkhd',
+		'HOST': 'salt.db.elephantsql.com',
 		'PORT': '5432'
 	}
 }
@@ -123,6 +124,5 @@ django_heroku.settings(locals())
 
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = (
-	os.path.join(BASE_DIR, 'static'),
-)
+MEDIA_ROOT = os.path.join(BASE_DIR, 'documents')
+MEDIA_URL = '/documents/'
