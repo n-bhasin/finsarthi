@@ -14,15 +14,14 @@
         {% endif %}
     </div>
 
-    {% if user.groups.values.get.name == 'Admin' %}
 
-    {% endif %}
 
-    <div class="col-md-12">
-        <a href="{% url 'create_campaign' %}">
-            <button class="btn btn-primary" type="submit">Create New</button>
-        </a>
-    </div>
+        <div class="col-md-12">
+            <a href="{% url 'create_campaign' %}">
+                <button class="btn btn-primary" type="submit">Create New</button>
+            </a>
+        </div>
+
     {#    create campaign button#}
 
     {#search campaign bar#}
@@ -75,6 +74,7 @@
 
                 </div>
             </div>
+
 
 
         </div>
