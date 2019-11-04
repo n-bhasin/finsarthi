@@ -1,11 +1,12 @@
 from django.urls import path
+from django.conf.urls import url
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-	path('', views.form_view, name='form_view'),
 	path('login_view', views.login_view, name='login_view'),
+	path('', views.form_view, name='form_view'),
 	# path('register', views.register_view, name='register_view'),
 	path('logout', views.logout_view, name='logout_view'),
 	path('home', views.home, name='home'),
@@ -18,7 +19,10 @@ urlpatterns = [
 	# path('browse_prospects', views.browse_prospects, name='browse_prospects'),
 
 	# employees
-	path('add_employee', views.add_employee, name='add_employee'),
+	url(r'^add_employee/$', views.add_employee, name='add_employee'),
+	url(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', views.activate,
+	    name='activate'),
+	# path('add_employee', views.add_employee, name='add_employee'),
 	path('<int:id>/edit', views.edit, name='edit'),
 	path('<int:id>/delete', views.delete, name='delete'),
 	# campaigns

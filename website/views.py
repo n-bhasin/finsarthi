@@ -1,14 +1,22 @@
 import requests
-import csv, io, pandas
+import pandas, random, string
 from django.shortcuts import render, reverse, redirect, get_object_or_404
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.core.mail import EmailMessage
+from django.contrib.sites.shortcuts import get_current_site
 from django.contrib import messages
+from django.template.loader import render_to_string
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+
+from .tokens import account_activation_token
 
 from .forms import UserLoginForm, \
-	UploadFile, EmployeeForm, Campaign, CampaignUser
+	UploadFile, EmployeeForm, Campaign, CampaignUser, UserDetail
 from .models import Contact, Documents, NewCampaign, Information
 
 camp_fetch = NewCampaign.objects.order_by('id').all()
@@ -51,6 +59,64 @@ def login_view(request):
 	return render(request, template, context)
 
 
+@login_required(login_url=login_view)
+def add_employee(request):
+	context = {}
+	if request.method == 'POST':
+		form = EmployeeForm(request.POST or None)
+		if form.is_valid():
+			email = form.cleaned_data.get('email')
+
+			user = form.save(commit=False)
+			user.username = email.split('@')[0]
+			password = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
+			print(password)
+			user.password = make_password(password=password, salt=None)
+			user.is_active = False
+
+			print(user.pk)
+			user.save()
+			form.roleSave()
+			current_site = get_current_site(request)
+			message = render_to_string('acc_activate_email.html', {
+				'user': user,
+				'password': password,
+				'domain': current_site.domain,
+				'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+				'token': account_activation_token.make_token(user),
+			})
+			mail_subject = 'Activate your account.'
+			to_email = form.cleaned_data.get('email')
+			email = EmailMessage(mail_subject, message, to=[to_email])
+			email.send()
+			messages.success(request, "Activation Link is Sent Successfully.")
+			return HttpResponseRedirect(reverse('home'))
+
+	else:
+		form = EmployeeForm()
+		context['employee_form'] = form
+		context['users'] = User.objects.order_by("id").all()
+		return render(request, 'website/add_employee.html', context)
+
+
+def activate(request, uidb64, token):
+	try:
+		uid = force_text(urlsafe_base64_decode(uidb64))
+		print()
+		user = User.objects.get(pk=uid)
+
+	except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+		user = None
+	if user is not None and account_activation_token.check_token(user, token):
+		user.is_active = True
+		user.save()
+		login(request, user)
+		# return redirect('home')
+		return HttpResponse('Thank you for your email confirmation. Now you can login your account.')
+	else:
+		return HttpResponse('Activation link is invalid!')
+
+
 # logout view
 @login_required(login_url=login_view)
 def logout_view(request):
@@ -73,38 +139,63 @@ def home(request):
 		return render(request, 'website/home.html', context)
 
 
-@login_required(login_url=login_view)
-def add_employee(request):
-	context = {}
-	if request.user.first_name == 'Admin':
-		employee_form = EmployeeForm(request.POST or None)
-
-		if employee_form.is_valid():
-			employee_form.save()
-			messages.success(request, "User is Added")
-			return HttpResponseRedirect(reverse('add_employee'))
-		context['employee_form'] = employee_form
-		context['users'] = User.objects.order_by("id").all()
-		return render(request, 'website/add_employee.html', context)
-	messages.error(request, "You are not authorized.")
-	return HttpResponseRedirect(reverse('home'))
-
+# @login_required(login_url=login_view)
+# def add_employee(request):
+# 	context = {}
+# 	if request.user.first_name == 'Admin':
+# 		employee_form = EmployeeForm(request.POST or None)
+#
+# 		if employee_form.is_valid():
+# 			employee_form.save()
+# 			messages.success(request, "User is Added")
+# 			return HttpResponseRedirect(reverse('add_employee'))
+# 		context['employee_form'] = employee_form
+# 		context['users'] = User.objects.order_by("id").all()
+# 		return render(request, 'website/add_employee.html', context)
+# 	messages.error(request, "You are not authorized.")
+# 	return HttpResponseRedirect(reverse('home'))
+#
 
 @login_required(login_url=login_view)
 def edit(request, id):
 	context = {}
 
 	employee = get_object_or_404(User, id=id)
-	if request.method == 'POST':
-		employee_form = EmployeeForm(request.POST, instance=employee)
-		if employee_form.is_valid():
-			employee_form.save()
-			messages.success(request, "User has been edited.")
-			return HttpResponseRedirect(reverse('add_employee'))
+	if request.user.first_name == 'Admin':
+
+		if request.method == 'POST':
+			employee_form = EmployeeForm(request.POST, instance=employee)
+			if employee_form.is_valid():
+				print('yes valid')
+				employee_form.roleSave()
+				employee_form.save()
+				messages.success(request, "User has been edited.")
+				context['employee_form'] = employee_form
+				return HttpResponse('edited')
+				# return render(request, 'website/add_employee.html', context)
+			else:
+				messages.error(request, 'return none')
+				return HttpResponse('nothing')
+		else:
+			employee_form = EmployeeForm(instance=employee)
+			context['employee_form'] = employee_form
+			return render(request, 'website/edit.html', context)
+
+	elif request.user.first_name == 'Admin' or 'Telecaller' or 'Field Exec' or 'Manager':
+		if request.method == 'POST':
+			employee_form = UserDetail(request.POST, instance=employee)
+			if employee_form.is_valid():
+				employee_form.save()
+				messages.success(request, "User has been edited.")
+				context['employee_form'] = employee_form
+				return render(request, 'website/add_employee.html', context)
+		else:
+			employee_form = UserDetail(instance=employee)
+			context['employee_form'] = employee_form
+			return render(request, 'website/edit.html', context)
 	else:
-		employee_form = EmployeeForm(instance=employee)
-		context['employee_form'] = employee_form
-		return render(request, 'website/edit.html', context)
+		messages.success(request, "You are not Authorized.")
+		return HttpResponseRedirect(reverse(home))
 
 
 @login_required(login_url=login_view)
@@ -290,13 +381,18 @@ def prospect_detail(request, id):
 	# print(pid.id)
 
 	if request.method == "POST":
-		email = request.POST['email']
 		disposition = request.POST['disposition']
+		sub_disposition = request.POST.get('unqualified_disposition')
+		callback = request.POST['callback_datetime']
+		appointment_callback = request.POST['appointment_datetime']
 		remark = request.POST['remarks']
 		Information.objects.update_or_create(
-			email=email, status=disposition, remarks=remark, contact_id=pid.id
+			disposition=disposition, sub_disposition=sub_disposition,
+			callback_follow_up=callback, appointment_follow_up=appointment_callback,
+			remarks=remark, contact_id=pid.id
 		)
-		return HttpResponseRedirect(reverse(browse_prospects, args=[pid.id, ]))
+		messages.success(request, 'Successfully saved')
+		return HttpResponseRedirect(reverse(prospect_detail, args=[pid.id, ]))
 
 	else:
 		context['contact'] = pid

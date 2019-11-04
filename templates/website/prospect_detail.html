@@ -4,8 +4,19 @@
 {% endblock %}
 {% block content %}
     <div class="col-md-12">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="col-sm-3 fade show alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    {{ message|title }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+    <div class="col-md-12">
         <h5>Contact Details</h5>
-        <p><button type="button" class="btn btn-primary">{{ contact.phone_number }}</button>
+        <p>
+            <a href="tel: {{ contact.phone_number }}" class="btn btn-primary">Call</a>
 
         </p>
     </div>
@@ -14,45 +25,79 @@
         <form method="post" action="">
             {% csrf_token %}
 
-            <h5>Email</h5>
-            <div class="form-group">
-                <input type="email" class="form-control" name="email" id="exampleInputEmail1" aria-describedby="emailHelp"
-                       placeholder="Enter email">
-            </div>
+
             <br>
             <h5>Disposition</h5>
             <div class="form-check">
 
-                <input class="form-check-input" type="radio" name="disposition" id="exampleRadios1" value="callback">
+                <input class="form-check-input" type="radio" name="disposition"
+                       onclick="hide(); show_callback('datetime');"
+                       id="callbacktime"
+                       value="Callback">
                 <label class="form-check-label" for="exampleRadios1">
                     Call Back
                 </label>
             </div>
+            <div class="col-md-3 form-group" style="display: none" id="datetime">
+                <h6>Callback Date time</h6>
+                <input type="text" id="picker" class="form-control" name="callback_datetime">
+            </div>
+
+            <!-- Appointment-->
             <div class="form-check">
-                <input class="form-check-input" type="radio" name="disposition" id="exampleRadios1"
-                       value="notinterested">
+                <input class="form-check-input" type="radio" name="disposition"
+                       onclick="hide(); show_appointment('appointment_datetime');"
+                       id="appointment"
+                       value="Appointment">
                 <label class="form-check-label" for="exampleRadios1">
-                    Not Interested
+                    Appointment
                 </label>
             </div>
+            <div class="col-md-3 form-group" style="display: none" id="appointment_datetime">
+                <h6>Appointent Date time</h6>
+                <input type="text" id="picker_appointment" class="form-control" name="appointment_datetime">
+            </div>
+
             <div class="form-check">
-                <input class="form-check-input" type="radio" name="disposition" id="exampleRadios1" value="noteligible">
+                <input class="form-check-input" type="radio" name="disposition" onclick="hide(); show_unqualified()"
+                       id="exampleRadios1"
+                       value="Unqualified">
                 <label class="form-check-label" for="exampleRadios1">
-                    Not Eligible
+                    Unqualified
                 </label>
             </div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="disposition" id="exampleRadios1" value="notreachable">
-                <label class="form-check-label" for="exampleRadios1">
-                    Not reachable
-                </label>
+            <div class="col-md-4 form-check" id="show_unqualified" style="display: none;">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="sub_disposition" id="exampleRadios1"
+                           value="not Interested">
+                    <label class="form-check-label" for="exampleRadios1">
+                        Not Interested
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="sub_disposition" id="exampleRadios1"
+                           value="Not Eligible">
+                    <label class="form-check-label" for="exampleRadios1">
+                        Not Eligible
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="sub_disposition" id="exampleRadios1"
+                           value="not Reachable">
+                    <label class="form-check-label" for="exampleRadios1">
+                        Not reachable
+                    </label>
+                </div>
             </div>
+
             <div class="form-check">
-                <input class="form-check-input" type="radio" name="disposition" id="exampleRadios1" value="Interested">
+                <input class="form-check-input" type="radio" name="disposition" onclick="hide()" id="exampleRadios1"
+                       value="Interested">
                 <label class="form-check-label" for="exampleRadios1">
                     Interested
                 </label>
             </div>
+
             <br>
             <h5>Remarks</h5>
             <div class="form-group">
@@ -60,7 +105,29 @@
             </div>
             <button type="submit" class="btn btn-primary">Save</button>
         </form>
+        <script>
+            function hide() {
+                document.getElementById('datetime').style.display = 'none';
+                document.getElementById('appointment_datetime').style.display = 'none';
+                document.getElementById('show_unqualified').style.display = 'none';
 
+            }
+
+            function show_callback() {
+                document.getElementById('datetime').style.display = 'block';
+
+            }
+
+            function show_appointment() {
+
+                document.getElementById('appointment_datetime').style.display = 'block';
+            }
+
+            function show_unqualified() {
+                document.getElementById("show_unqualified").style.display = 'block';
+
+            }
+        </script>
     </div>
 
 {% endblock %}

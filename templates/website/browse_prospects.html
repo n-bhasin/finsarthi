@@ -35,7 +35,7 @@
 
 
             <li class="nav-item">
-                <a class="nav-link " href="#">Browse Prospect</a>
+                <a class="nav-link" href="#">Prospect</a>
 
             </li>
         </ul>
@@ -51,9 +51,9 @@
                         <table class="table table-bordered">
                             <tr>
                                 <th>Name</th>
-                                <th>Phone</th>
-                                <th>Email</th>
+
                                 <th>Status</th>
+                                <th>Follow Up</th>
                                 <th>Remarks</th>
                             </tr>
                             {% for ud in fetch_data %}
@@ -61,9 +61,21 @@
                                 <tr>
 
                                     <td><a href="/{{ ud.id }}/prospect_detail">{{ ud.name|title }}</a></td>
-                                    <td>{{ ud.phone_number }}</td>
-                                    <td>{{ ud.email|title }}</td>
-                                    <td>{{ ud.status|title }}</td>
+{#                                    <td>{{ ud.phone_number }}</td>#}
+                                    <td>{% if ud.disposition != None %}
+                                        {{ ud.disposition|title }} &nbsp;
+                                    {% endif %}
+                                        {% if ud.sub_disposition != None %}
+                                        {{ ud.sub_disposition|title }}
+                                        {% endif %}
+                                        </td>
+                                    <td>{% if ud.appointment_follow_up != None %}
+                                        {{ ud.appointment_follow_up|title }}
+                                    {% endif %}
+                                        {% if ud.callback_follow_up != None %}
+                                        {{ ud.callback_follow_up|title }}
+                                        {% endif %}
+                                        </td>
                                     <td>{{ ud.remarks|title }}</td>
 
                                 </tr>

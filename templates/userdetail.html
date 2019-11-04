@@ -1,0 +1,74 @@
+{% load static %}
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{% block title %}{% endblock %}</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <style>
+        .m0 {
+            margin: 0
+        }
+
+        .p0 {
+            padding: 0;
+        }
+
+        .mt-30 {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8 offset-md-4 mt-30">
+            <h1>Login Page</h1>
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="col-sm-4 fade show alert alert-success alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                        <strong>Success!</strong>{{ message|title }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="col-md-3 offset-md-4">
+            <form action="{% url 'addPassword' uid %}" method="post">
+                {% csrf_token %}
+            {{ uid }}
+                {% for non_field_error in passform.non_field_error %}
+                    <p class="help text-danger">{{ non_field_error }}</p>
+                {% endfor %}
+
+                {% for field in passform %}
+                    <div class="form-group field">
+                        <label for="{{ field.id_for_label }}" class="label">{{ field.html_name }}</label>
+                        {{ field }}
+
+                        {% if field.help_text %}
+                            <p class="help">{{ field.help_text }}</p>
+                        {% endif %}
+
+                        {% for error in field.errors %}
+                            <p class="help text-danger">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+
+                <button type="submit" class="btn btn-primary">SAVE</button>
+            </form>
+{#            <p><a href="{% url 'register_view' %}">Register</a></p>#}
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

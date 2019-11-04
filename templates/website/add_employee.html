@@ -13,11 +13,10 @@
         {% endif %}
     </div>
     <div class="col-md-12">
-        <button data-toggle="collapse" data-target="#demo" class="btn btn-primary">ADD USER</button>
-        <br>
+        <h3>Add New User</h3>
         <hr>
-        <div id="demo" class="collapse">
-            <form action="" method="post">
+        <div id="demo" class="active">
+            <form action="{% url 'add_employee' %}" method="post">
                 {% csrf_token %}
                 {% for user_fields in employee_form %}
                     <div class="form-group field">
@@ -69,10 +68,11 @@
                     <td>{% for name in user.groups.values %}{{ name.name }}&nbsp;{% endfor %}</td>
                     <td>{{ user.last_login }}</td>
 
-                    <td><a href="{{ user.id }}/edit">
-                        <button type="submit" class="btn btn-primary">Edit</button>
-                    </a>
-                        <a href="{{ user.id }}/delete">
+                    <td>
+{#                        <a href="{% url 'edit' user.id %}">#}
+{#                        <button type="submit" class="btn btn-primary">Edit</button>#}
+{#                    </a>#}
+                        <a href="/{{ user.id }}/delete">
                             <button type="submit" class="btn btn-danger">Delete</button>
                         </a>
                     </td>

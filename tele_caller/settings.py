@@ -23,9 +23,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '(h+a)lbpzv9%b)r#u$3zv$=)^o0-%ob=299$vchku=m6$@jx-%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['.herokuapp.com']
+ALLOWED_HOSTS = ['finsarthi.herokuapp.com']
 
 # Application definition
 
@@ -108,7 +108,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'Asia/Calcutta'
+TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
@@ -126,3 +126,10 @@ STATIC_URL = '/static/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'documents')
 MEDIA_URL = '/documents/'
+
+# email authentication
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'nkbhasin28@gmail.com'
+EMAIL_HOST_PASSWORD = 'kgcdggydbliakvrb'
+EMAIL_PORT = 587

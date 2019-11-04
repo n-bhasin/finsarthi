@@ -1,7 +1,9 @@
 import os
 
+from django import forms
 from django.db import models
 from django.contrib.auth.models import User, Group
+from datetime import datetime
 
 
 # Create your models here.
@@ -43,17 +45,44 @@ class Contact(models.Model):
 		for u in self.contact_info.values():
 			return u['id']
 
-	def email(self):
+	def disposition(self):
 		for u in self.contact_info.values():
-			return u['email']
+			return u['disposition']
 
-	def status(self):
+	def sub_disposition(self):
 		for u in self.contact_info.values():
-			return u['status']
+			return u['sub_disposition']
 
-	def remarks(self):
+	def appointment_follow_up(self):
 		for u in self.contact_info.values():
-			return u['remarks']
+			str = u['appointment_follow_up']
+			if str is '':
+				return u['appointment_follow_up']
+				break
+			elif str is None:
+				return u['appointment_follow_up']
+				break
+			else:
+				new_str = datetime.strptime(str, '%Y-%m-%d %H:%M')
+				return new_str
+
+	def callback_follow_up(self):
+		for u in self.contact_info.values():
+			str = u['callback_follow_up']
+			if str is '':
+				return u['callback_follow_up']
+				break
+			elif str is None:
+				return u['callback_follow_up']
+				break
+			else:
+				new_str = datetime.strptime(str, '%Y-%m-%d %H:%M')
+				return new_str
+
+
+def remarks(self):
+	for u in self.contact_info.values():
+		return u['remarks']
 
 
 CONTACT_STATUS = [
@@ -66,7 +95,9 @@ CONTACT_STATUS = [
 
 
 class Information(models.Model):
-	email = models.EmailField(blank=True)
-	status = models.CharField(max_length=100, blank=True)
+	disposition = models.CharField(max_length=100, blank=True)
+	sub_disposition = models.CharField(max_length=100, blank=True, null=True)
+	callback_follow_up = models.CharField(max_length=100, null=True, blank=True)
+	appointment_follow_up = models.CharField(max_length=100, null=True, blank=True)
 	remarks = models.CharField(max_length=1000, blank=True)
 	contact = models.ForeignKey(Contact, on_delete=models.CASCADE, related_name='contact_info', null=True)

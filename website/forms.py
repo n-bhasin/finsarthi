@@ -1,8 +1,9 @@
-from django import forms
 from django.contrib.auth import authenticate, \
 	get_user_model
+from django.contrib.auth.forms import UserCreationForm
+from django import forms
 from django.contrib.auth.models import User, Group
-from .models import Documents, Contact, NewCampaign, Information, CONTACT_STATUS
+from .models import Documents, Contact, NewCampaign
 
 RegisterUser = get_user_model()
 
@@ -10,7 +11,7 @@ RegisterUser = get_user_model()
 # user login form
 class UserLoginForm(forms.Form):
 	username = forms.CharField(max_length=8, widget=forms.TextInput(attrs={'class': 'form-control'}))
-	password = forms.CharField(max_length=8, widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+	password = forms.CharField(max_length=20, widget=forms.PasswordInput(attrs={'class': 'form-control'}))
 
 	def clean(self, *args, **kwargs):
 		username = self.cleaned_data.get('username')
@@ -27,49 +28,50 @@ class UserLoginForm(forms.Form):
 			return super(UserLoginForm, self).clean(*args, **kwargs)
 
 
-# user registration form
-class UserRegisterForm(forms.ModelForm):
-	email = forms.EmailField(label='Email Address', widget=forms.TextInput(attrs={'class': 'form-control'}))
-	email2 = forms.EmailField(label='Confirm Email', widget=forms.TextInput(attrs={'class': 'form-control'}))
-	password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+#
+# # user registration form
+# class UserRegisterForm(forms.ModelForm):
+# 	email = forms.EmailField(label='Email Address', widget=forms.TextInput(attrs={'class': 'form-control'}))
+# 	email2 = forms.EmailField(label='Confirm Email', widget=forms.TextInput(attrs={'class': 'form-control'}))
+# 	password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+#
+# 	class Meta:
+# 		model = RegisterUser
+# 		fields = [
+# 			'username',
+# 			'email',
+# 			'email2',
+# 			'password'
+# 		]
+# 		widgets = {
+# 			'username': forms.TextInput(attrs={'class': 'form-control'})
+# 		}
+#
+# 		def clean_email(self):
+# 			email = self.cleaned_data.get('email')
+# 			email2 = self.cleaned_data.get('email2')
+# 			if email != email2:
+# 				raise forms.ValidationError("Email must match.")
+# 			email_qs = RegisterUser.objects.filter(email=email)
+# 			if email_qs.exists():
+# 				raise forms.ValidationError("Email already exist.")
+# 			return email
 
-	class Meta:
-		model = RegisterUser
-		fields = [
-			'username',
-			'email',
-			'email2',
-			'password'
-		]
-		widgets = {
-			'username': forms.TextInput(attrs={'class': 'form-control'})
-		}
 
-		def clean_email(self):
-			email = self.cleaned_data.get('email')
-			email2 = self.cleaned_data.get('email2')
-			if email != email2:
-				raise forms.ValidationError("Email must match.")
-			email_qs = RegisterUser.objects.filter(email=email)
-			if email_qs.exists():
-				raise forms.ValidationError("Email already exist.")
-			return email
-
-
-# conatct form
-class Contact(forms.ModelForm):
-	class Meta:
-		model = Contact
-		fields = [
-			'name',
-			'phone_number'
-		]
-
+# # conatct form
+# class Contact(forms.ModelForm):
+# 	class Meta:
+# 		model = Contact
+# 		fields = [
+# 			'name',
+# 			'phone_number'
+# 		]
 
 
 # csv upload form
 class UploadFile(forms.ModelForm):
-	new_camp = forms.ModelChoiceField(queryset=NewCampaign.objects.all())
+	new_camp = forms.ModelChoiceField(queryset=NewCampaign.objects.all(),
+	                                  widget=forms.Select(attrs={'class': 'custom-select mr-sm-2'}))
 
 	class Meta:
 		model = Documents
@@ -86,10 +88,8 @@ class UploadFile(forms.ModelForm):
 
 # campaign form
 class Campaign(forms.ModelForm):
-	# name = forms.CharField(max_length=20, widget=forms.TextInput(attrs={'class': 'form-control'}))
-	# script = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control'}))
-	# camp_user = forms.ModelMultipleChoiceField(queryset=User.objects.filter(groups__name=NewCampaign.assign_to))
-	assign_to = forms.ModelMultipleChoiceField(queryset=Group.objects.all())
+	assign_to = forms.ModelMultipleChoiceField(queryset=Group.objects.all(),
+	                                           widget=forms.SelectMultiple(attrs={'class': 'custom-select mr-sm-2'}))
 
 	class Meta:
 		model = NewCampaign
@@ -97,6 +97,7 @@ class Campaign(forms.ModelForm):
 			'name',
 			'script',
 			'assign_to',
+
 		]
 		labels = {
 			'name': 'Name',
@@ -113,7 +114,8 @@ class Campaign(forms.ModelForm):
 
 # campaign User
 class CampaignUser(forms.ModelForm):
-	camp_user = forms.ModelMultipleChoiceField(queryset=User.objects.all())
+	camp_user = forms.ModelMultipleChoiceField(queryset=User.objects.all(),
+	                                           widget=forms.Select(attrs={'class': 'custom-select mr-sm-2'}))
 
 	class Meta:
 		model = NewCampaign
@@ -127,30 +129,21 @@ class CampaignUser(forms.ModelForm):
 
 # add_employee
 class EmployeeForm(forms.ModelForm):
-	password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
-	role = forms.ModelChoiceField(queryset=Group.objects.all())
+	email = forms.EmailField(label='Email Address', help_text='Required',
+	                         widget=forms.TextInput(attrs={'class': 'form-control'}))
+	role = forms.ModelChoiceField(queryset=Group.objects.all(),
+	                              widget=forms.Select(attrs={'class': 'custom-select mr-sm-2'}))
 
 	class Meta:
 		model = User
 		fields = [
-			'first_name',
-			'last_name',
-			'email',
-			'username',
-			'password'
+			'email'
 		]
 		labels = {
-			'first name': 'First Name',
-			'last_name': 'Last Name',
-			'email': 'Email',
-			'username': 'Username',
-			'password': 'Password'
+			'email': 'Email'
 		}
 		widgets = {
-			'first_name': forms.TextInput(attrs={'class': 'form-control'}),
-			'last_name': forms.TextInput(attrs={'class': 'form-control'}),
 			'email': forms.EmailInput(attrs={'class': 'form-control'}),
-			'username': forms.TextInput(attrs={'class': 'form-control'}),
 
 		}
 
@@ -165,8 +158,14 @@ class EmployeeForm(forms.ModelForm):
 				initial['role'] = None
 		forms.ModelForm.__init__(self, *args, **kwargs)
 
-	def save(self):
-		password = self.cleaned_data.pop('password')
+	def clean_email(self):
+		email = self.cleaned_data.get('email')
+		email_qs = RegisterUser.objects.filter(email=email)
+		if email_qs.exists():
+			raise forms.ValidationError("Email already exist.")
+		return email
+
+	def roleSave(self):
 		role = self.cleaned_data.pop('role')
 		# updated_role = []
 		# # iterating the queryset and appending the values in empty list
@@ -176,6 +175,11 @@ class EmployeeForm(forms.ModelForm):
 
 		u = super().save()
 		u.groups.set([role])
-		u.set_password(password)
 		u.save()
 		return u
+
+
+class UserDetail(UserCreationForm):
+	class Meta:
+		model = User
+		fields = ('username', 'password1', 'password2')
