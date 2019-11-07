@@ -10,7 +10,7 @@ RegisterUser = get_user_model()
 
 # user login form
 class UserLoginForm(forms.Form):
-	username = forms.CharField(max_length=8, widget=forms.TextInput(attrs={'class': 'form-control'}))
+	username = forms.CharField(max_length=20, widget=forms.TextInput(attrs={'class': 'form-control'}))
 	password = forms.CharField(max_length=20, widget=forms.PasswordInput(attrs={'class': 'form-control'}))
 
 	def clean(self, *args, **kwargs):
@@ -115,7 +115,7 @@ class Campaign(forms.ModelForm):
 # campaign User
 class CampaignUser(forms.ModelForm):
 	camp_user = forms.ModelMultipleChoiceField(queryset=User.objects.all(),
-	                                           widget=forms.Select(attrs={'class': 'custom-select mr-sm-2'}))
+	                                           widget=forms.SelectMultiple(attrs={'class': 'custom-select mr-sm-2'}))
 
 	class Meta:
 		model = NewCampaign

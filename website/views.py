@@ -143,7 +143,7 @@ def edit(request, id):
 	context = {}
 
 	employee = get_object_or_404(User, id=id)
-	if request.user.first_name == 'Admin':
+	if request.user.is_superuser:
 
 		if request.method == 'POST':
 			form = EmployeeForm(request.POST, instance=employee)
@@ -166,7 +166,7 @@ def edit(request, id):
 			context['employee_form'] = employee_form
 			return render(request, 'website/edit.html', context)
 
-	elif request.user.first_name == 'Admin' or 'Telecaller' or 'Field Exec' or 'Manager':
+	elif request.user.is_superuser or 'Telecaller' or 'Field Exec' or 'Manager':
 		employee_form = UserDetail(request.POST, instance=employee)
 		if request.method == 'POST':
 			if employee_form.is_valid():
@@ -186,7 +186,7 @@ def edit(request, id):
 @login_required(login_url=login_view)
 def delete(request, id):
 	context = {}
-	if request.user.first_name == 'Admin':
+	if request.user.is_superuser:
 		employee = get_object_or_404(User, id=id)
 		if request.method == 'POST':
 			employee.delete()
@@ -205,7 +205,7 @@ def delete(request, id):
 def create_campaign(request):
 	context = {}
 	# print(request.user.groups.values().get())
-	if request.user.first_name == 'Admin':
+	if request.user.is_superuser:
 		campaign_form = Campaign(request.POST or None)
 
 		if campaign_form.is_valid():
@@ -236,15 +236,21 @@ def detail_campaign(request, id):
 @login_required(login_url=login_view)
 def add_campaign_user(request, id):
 	context = {}
-	if request.user.first_name == 'Admin':
+	if request.user.is_superuser:
 		camp_id = get_object_or_404(NewCampaign, id=id)
 		camp_user = CampaignUser(request.POST, instance=camp_id)
+		print(camp_user)
 		if request.method == 'POST':
+			print('post')
 			if camp_user.is_valid():
+				print('valid')
 				camp_user.save()
 				messages.success(request, "User is added.")
-				return HttpResponseRedirect(reverse('detail_campaign', args=[camp_id.id, ]))
+				return HttpResponseRedirect('detail_campaign')
+			else:
+				print('not')
 		else:
+			print('notvalid')
 			cu = CampaignUser(instance=camp_id)
 			context['camp_user'] = cu
 			context['camp_id'] = camp_id
@@ -256,7 +262,7 @@ def add_campaign_user(request, id):
 def edit_camp(request, id):
 	cid = get_object_or_404(NewCampaign, id=id)
 	print(cid)
-	if request.user.first_name == 'Admin':
+	if request.user.is_superuser:
 		if request.method == 'POST':
 			campaign_form = Campaign(request.POST, instance=cid)
 			if campaign_form.is_valid():
@@ -276,7 +282,7 @@ def edit_camp(request, id):
 def delete_camp(request, id):
 	cid = get_object_or_404(NewCampaign, id=id)
 	print(cid)
-	if request.user.first_name == 'Admin':
+	if request.user.is_superuser:
 		if request.method == 'POST':
 			cid.delete()
 			messages.success(request, 'Campaign is deleted.')
@@ -340,6 +346,7 @@ def prospect(request, id):
 	context['form_upload'] = form_upload
 
 	context['fetch'] = doc_fetch
+	print(doc_fetch)
 	context['camp_id'] = id
 
 	return render(request, 'website/prospect.html', context)

@@ -20,14 +20,14 @@
                 <a class="nav-link" href="{% url 'home' %}">Campaigns</a>
             </li>
 
-            {% if request.user.first_name != 'Admin' %}
+            {% if request.user.is_superuser is False %}
                 <li class="nav-item">
                     <a class="nav-link" href="user_detail">User</a>
                 </li>
 
             {% endif %}
 
-            {% if request.user.first_name == 'Admin' %}
+            {% if request.user.is_superuser %}
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#user">Add User</a>
                 </li>

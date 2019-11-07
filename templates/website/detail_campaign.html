@@ -20,13 +20,13 @@
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'home' %}">Campaigns</a>
             </li>
-            {% if request.user.first_name != 'Admin' %}
+            {% if request.user.first_name is False %}
                 <li class="nav-item">
                     <a class="nav-link" href="user_detail">User</a>
                 </li>
 
             {% endif %}
-            {% if request.user.first_name == 'Admin' %}
+            {% if request.user.is_superuser %}
                 <li class="nav-item">
                     <a class="nav-link" href="add_campaign_user">Members</a>
                 </li>
@@ -57,7 +57,7 @@
                     <p>{{ camp_detail.date }}</p>
                     <strong>Member</strong>
                     <p>{% for n in camp_detail.camp_user.all %}{{ n }},{% endfor %}</p>
-                    {% if user.groups.values.get.name == 'Admin' %}
+                    {% if request.user.is_superuser %}
                         <a href="edit_camp">
                             <button type="submit" class="btn btn-primary">Edit</button>
                         </a>
