@@ -12,18 +12,17 @@ urlpatterns = [
 	path('home', views.home, name='home'),
 
 	# csv uploads
-	path('prospect', views.prospect, name='prospect'),
+	path('<int:id>/prospect', views.prospect, name='prospect'),
 	path('file_upload', views.file_upload, name='file_upload'),
 	path('<int:id>/prospect_detail', views.prospect_detail, name='prospect_detail'),
-	path('<int:id>/browse_prospects', views.browse_prospects, name='browse_prospects'),
+	path('<id>/browse_prospects', views.browse_prospects, name='browse_prospects'),
 	# path('browse_prospects', views.browse_prospects, name='browse_prospects'),
 
 	# employees
-	url(r'^add_employee/$', views.add_employee, name='add_employee'),
+	path('add_employee', views.add_employee, name='add_employee'),
 	url(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', views.activate,
 	    name='activate'),
-	# path('add_employee', views.add_employee, name='add_employee'),
-	path('<int:id>/edit', views.edit, name='edit'),
+	path('<id>/edit', views.edit, name='edit'),
 	path('<int:id>/delete', views.delete, name='delete'),
 	# campaigns
 	path('create_campaign', views.create_campaign, name='create_campaign'),
@@ -34,7 +33,7 @@ urlpatterns = [
 	# campaign users
 	path('<int:id>/user_detail', views.user_detail, name='user_detail'),
 
-]
+]+ static(settings.STATIC_URL, document_root=settings.STATIC_URL)
 
 if settings.DEBUG:
 	urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

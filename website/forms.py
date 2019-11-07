@@ -70,14 +70,14 @@ class UserLoginForm(forms.Form):
 
 # csv upload form
 class UploadFile(forms.ModelForm):
-	new_camp = forms.ModelChoiceField(queryset=NewCampaign.objects.all(),
-	                                  widget=forms.Select(attrs={'class': 'custom-select mr-sm-2'}))
+	# new_camp = forms.ModelChoiceField(queryset=NewCampaign.objects.all(),
+	#                                   widget=forms.Select(attrs={'class': 'custom-select mr-sm-2'}))
 
 	class Meta:
 		model = Documents
 		fields = (
 			'document',
-			'new_camp',
+			# 'new_camp',
 		)
 
 		labels = {
@@ -129,8 +129,8 @@ class CampaignUser(forms.ModelForm):
 
 # add_employee
 class EmployeeForm(forms.ModelForm):
-	email = forms.EmailField(label='Email Address', help_text='Required',
-	                         widget=forms.TextInput(attrs={'class': 'form-control'}))
+	email = forms.EmailField(label='Email Address',
+	                         widget=forms.TextInput(attrs={'class': 'form-control'}) )
 	role = forms.ModelChoiceField(queryset=Group.objects.all(),
 	                              widget=forms.Select(attrs={'class': 'custom-select mr-sm-2'}))
 
@@ -158,12 +158,12 @@ class EmployeeForm(forms.ModelForm):
 				initial['role'] = None
 		forms.ModelForm.__init__(self, *args, **kwargs)
 
-	def clean_email(self):
-		email = self.cleaned_data.get('email')
-		email_qs = RegisterUser.objects.filter(email=email)
-		if email_qs.exists():
-			raise forms.ValidationError("Email already exist.")
-		return email
+	# def clean_email(self):
+	# 	email = self.cleaned_data.get('email')
+	# 	email_qs = RegisterUser.objects.filter(email=email)
+	# 	if email_qs.exists():
+	# 		raise forms.ValidationError("Email already exist.")
+	# 	return email
 
 	def roleSave(self):
 		role = self.cleaned_data.pop('role')

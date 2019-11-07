@@ -8,7 +8,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'website/style.css' %}" type="text/css">
     <style>
         .m0 {
             margin: 0
@@ -20,6 +24,13 @@
 
         .mt-30 {
             margin-top: 30px;
+        }
+
+        .card-header {
+            padding: 0 !important;
+            margin-bottom: 0;
+            background-color: #bce8f1;
+            border-bottom: 1px solid rgba(0, 0, 0, .125);
         }
     </style>
 </head>
@@ -52,7 +63,7 @@
 
                             {% endif %}
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'prospect' %}">Prospects</a>
+                                {#                                <a class="nav-link" href="{% url 'prospect' %}">Prospects</a>#}
                             </li>
                         </ul>
 
@@ -85,6 +96,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js"></script>
+
 <script>
     $('#picker').datetimepicker({
         timepicker: true,

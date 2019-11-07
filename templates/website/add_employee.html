@@ -69,9 +69,9 @@
                     <td>{{ user.last_login }}</td>
 
                     <td>
-{#                        <a href="{% url 'edit' user.id %}">#}
-{#                        <button type="submit" class="btn btn-primary">Edit</button>#}
-{#                    </a>#}
+                        <a href="/{{ user.id }}/edit">
+                        <button type="submit" class="btn btn-primary">Edit</button>
+                    </a>
                         <a href="/{{ user.id }}/delete">
                             <button type="submit" class="btn btn-danger">Delete</button>
                         </a>

@@ -1,7 +1,7 @@
 import requests
 import pandas, random, string
 from django.shortcuts import render, reverse, redirect, get_object_or_404
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -59,6 +59,28 @@ def login_view(request):
 	return render(request, template, context)
 
 
+# logout view
+@login_required(login_url=login_view)
+def logout_view(request):
+	messages.success(request, "You're Successfully logged out.")
+	logout(request)
+	return redirect(login_view)
+
+
+# home
+@login_required(login_url=login_view)
+def home(request):
+	context = {}
+	session_user = request.user
+	if session_user is None:
+		return HttpResponseRedirect(reverse(login_view))
+	else:
+		context['user'] = session_user
+		context['camp_fetch'] = camp_fetch
+
+		return render(request, 'website/home.html', context)
+
+
 @login_required(login_url=login_view)
 def add_employee(request):
 	context = {}
@@ -74,7 +96,6 @@ def add_employee(request):
 			user.password = make_password(password=password, salt=None)
 			user.is_active = False
 
-			print(user.pk)
 			user.save()
 			form.roleSave()
 			current_site = get_current_site(request)
@@ -111,50 +132,11 @@ def activate(request, uidb64, token):
 		user.is_active = True
 		user.save()
 		login(request, user)
-		# return redirect('home')
-		return HttpResponse('Thank you for your email confirmation. Now you can login your account.')
+		messages.success(request, 'Thank you for your email confirmation. Now you can login your account.')
+		return redirect(login_view)
 	else:
 		return HttpResponse('Activation link is invalid!')
 
-
-# logout view
-@login_required(login_url=login_view)
-def logout_view(request):
-	messages.success(request, "You're Successfully logged out.")
-	logout(request)
-	return redirect(login_view)
-
-
-# home
-@login_required(login_url=login_view)
-def home(request):
-	context = {}
-	session_user = request.user
-	if session_user is None:
-		return HttpResponseRedirect(reverse(login_view))
-	else:
-		context['user'] = session_user
-		context['camp_fetch'] = camp_fetch
-
-		return render(request, 'website/home.html', context)
-
-
-# @login_required(login_url=login_view)
-# def add_employee(request):
-# 	context = {}
-# 	if request.user.first_name == 'Admin':
-# 		employee_form = EmployeeForm(request.POST or None)
-#
-# 		if employee_form.is_valid():
-# 			employee_form.save()
-# 			messages.success(request, "User is Added")
-# 			return HttpResponseRedirect(reverse('add_employee'))
-# 		context['employee_form'] = employee_form
-# 		context['users'] = User.objects.order_by("id").all()
-# 		return render(request, 'website/add_employee.html', context)
-# 	messages.error(request, "You are not authorized.")
-# 	return HttpResponseRedirect(reverse('home'))
-#
 
 @login_required(login_url=login_view)
 def edit(request, id):
@@ -164,26 +146,29 @@ def edit(request, id):
 	if request.user.first_name == 'Admin':
 
 		if request.method == 'POST':
-			employee_form = EmployeeForm(request.POST, instance=employee)
-			if employee_form.is_valid():
+			form = EmployeeForm(request.POST, instance=employee)
+			email = request.POST['email']
+			role = request.POST['role']
+			print(email, role)
+			print(form.is_valid())
+			if form.is_valid():
 				print('yes valid')
-				employee_form.roleSave()
-				employee_form.save()
-				messages.success(request, "User has been edited.")
-				context['employee_form'] = employee_form
-				return HttpResponse('edited')
-				# return render(request, 'website/add_employee.html', context)
+				form.roleSave()
+				form.save()
+				messages.success(request, "User edited Successfully.")
+				context['employee_form'] = form
+				return HttpResponseRedirect(reverse(add_employee))
 			else:
 				messages.error(request, 'return none')
-				return HttpResponse('nothing')
+				raise Http404
 		else:
 			employee_form = EmployeeForm(instance=employee)
 			context['employee_form'] = employee_form
 			return render(request, 'website/edit.html', context)
 
 	elif request.user.first_name == 'Admin' or 'Telecaller' or 'Field Exec' or 'Manager':
+		employee_form = UserDetail(request.POST, instance=employee)
 		if request.method == 'POST':
-			employee_form = UserDetail(request.POST, instance=employee)
 			if employee_form.is_valid():
 				employee_form.save()
 				messages.success(request, "User has been edited.")
@@ -243,7 +228,6 @@ def detail_campaign(request, id):
 	session_user = request.user
 
 	context['camp_detail'] = detail
-
 	context['user'] = session_user
 	return render(request, 'website/detail_campaign.html', context)
 
@@ -319,12 +303,13 @@ def file_upload(request):
 	print(form)
 	if request.method == 'POST':
 		csv_file = request.FILES['document']
-		new_camp_id = request.POST['new_camp']
+		new_camp_id = request.POST['campId']
+		doc = form.save(commit=False)
 		print(new_camp_id)
 		if not csv_file.name.endswith('.csv'):
 			print(csv_file.name.endswith('.csv'))
 			messages.error(request, 'Upload only csv files.')
-			return HttpResponseRedirect(reverse('prospect'))
+			return HttpResponseRedirect(reverse(home))
 		else:
 			if form.is_valid():
 				csv_file = pandas.read_csv(csv_file, header=0)
@@ -336,18 +321,18 @@ def file_upload(request):
 						phone_number=column[1],
 						new_cont_id=new_camp_id
 					)
-
+				doc.new_camp_id = new_camp_id
+				doc.save()
 				context['csv_file'] = csv_file
-				form.save()
 				messages.success(request, "FIle is uploaded")
-				return HttpResponseRedirect(reverse('prospect'))
+				return HttpResponseRedirect('%s/prospect' % new_camp_id)
 
 	context["form"] = form
 	return render(request, 'website/prospect.html', context)
 
 
 @login_required(login_url=login_view)
-def prospect(request):
+def prospect(request, id):
 	context = {}
 
 	form_upload = UploadFile(request.POST or None)
@@ -355,6 +340,7 @@ def prospect(request):
 	context['form_upload'] = form_upload
 
 	context['fetch'] = doc_fetch
+	context['camp_id'] = id
 
 	return render(request, 'website/prospect.html', context)
 
@@ -364,11 +350,10 @@ def browse_prospects(request, id):
 	context = {}
 	pid = get_object_or_404(NewCampaign, id=id)
 	fetch_data = Contact.objects.filter(new_cont_id=pid.id).all()
-	fetch_info = Information.objects.filter(contact_id=pid.id).all()
+
 	# print(fetch_data)
 	context['camp_fetch'] = pid
 	context['fetch_data'] = fetch_data
-	context['fetch_info'] = fetch_info
 
 	return render(request, 'website/browse_prospects.html', context)
 
@@ -376,24 +361,33 @@ def browse_prospects(request, id):
 @login_required(login_url=login_view)
 def prospect_detail(request, id):
 	context = {}
+
 	pid = get_object_or_404(Contact, id=id)
-	# form = ContactInformation(request.POST or None)
-	# print(pid.id)
+	handler = request.user.username
+	fetch_info = Information.objects.filter(contact_id=pid.id).order_by('-id').all()
+
+	# Information.objects.create(user_assign=handler)
+	# updated_id = Information.objects.filter(user_assign=handler).order_by('-id').first()
+	# print(updated_id.id)
 
 	if request.method == "POST":
-		disposition = request.POST['disposition']
+		wrong_number = request.POST.get('wrongNumber')
+		print(wrong_number)
+
+		disposition = request.POST.get('disposition')
 		sub_disposition = request.POST.get('unqualified_disposition')
 		callback = request.POST['callback_datetime']
 		appointment_callback = request.POST['appointment_datetime']
 		remark = request.POST['remarks']
 		Information.objects.update_or_create(
-			disposition=disposition, sub_disposition=sub_disposition,
+			wrong_number=wrong_number, disposition=disposition, sub_disposition=sub_disposition,
 			callback_follow_up=callback, appointment_follow_up=appointment_callback,
-			remarks=remark, contact_id=pid.id
+			remarks=remark, contact_id=pid.id, user_assign=handler
 		)
 		messages.success(request, 'Successfully saved')
-		return HttpResponseRedirect(reverse(prospect_detail, args=[pid.id, ]))
+		return HttpResponseRedirect('prospect_detail')
 
 	else:
 		context['contact'] = pid
+		context['contact_info'] = fetch_info
 		return render(request, 'website/prospect_detail.html', context)

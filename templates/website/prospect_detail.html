@@ -14,96 +14,202 @@
         {% endif %}
     </div>
     <div class="col-md-12">
-        <h5>Contact Details</h5>
-        <p>
-            <a href="tel: {{ contact.phone_number }}" class="btn btn-primary">Call</a>
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'home' %}">Campaigns</a>
+            </li>
+            {% if request.user.first_name != 'Admin' %}
+                <li class="nav-item">
+                    <a class="nav-link" href="user_detail">User</a>
+                </li>
 
-        </p>
+            {% endif %}
+            {% if request.user.first_name == 'Admin' %}
+                <li class="nav-item">
+                    <a class="nav-link" href="add_campaign_user">Members</a>
+                </li>
+            {% endif %}
+            <li class="nav-item"></li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">Prospect</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="browse_prospects">Browse</a>
+                    <a class="dropdown-item" href="#">Add New</a>
+                    <a class="dropdown-item" href="prospect">Import</a>
+                </div>
+            </li>
+        </ul>
+        <div class="col-md-12">
+        <h5>History</h5>
+               {% for info in contact_info.values %}
+            <div id="accordion">
+                <div class="card">
+                    <div class="card-header" id="headingOne">
+                        <h5 class="mb-0">
+                            <button class="btn btn-link" data-toggle="collapse" data-target="#collapse{{ info.id }}"
+                                    aria-expanded="true" aria-controls="collapse{{ info.id }}">
+                                <span class="fa fa-history "></span>
+
+                                {{ info.datetime }}|
+                                {% if info.disposition != None %}
+                                    {{ info.disposition|title }}
+                                {% endif %}
+                                {% if info.sub_disposition != None %}
+                                    {{ info.sub_disposition|title }}
+                                {% endif %}
+                                {% if info.wrong_number != None %}
+                                    {{ info.wrong_number|title }}
+                                {% endif %}
+                            </button>
+                        </h5>
+                    </div>
+
+                    <div id="collapse{{ info.id }}" class="collapse" aria-labelledby="heading{{ info.id }}"
+                         data-parent="#accordion">
+                        <div class="card-body">
+                            <div class="center">
+                                <p><strong>Created At</strong>: {{ info.datetime }}</p>
+                                <p><strong>Status</strong>: {% if info.disposition != None %}
+                                    {{ info.disposition|title }} &nbsp;
+                                {% endif %}
+                                    {% if info.sub_disposition != None %}
+                                        {{ info.sub_disposition|title }}
+                                    {% endif %}
+                                    {% if info.wrong_number != None %}
+                                        {{ info.wrong_number|title }}
+                                    {% endif %}</p>
+                                <p><strong>Handler</strong>: {{ info.user_assign }}</p>
+                                <p><strong>Remarks</strong>: {{ info.remarks }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
     </div>
     <hr>
+    <!-- contact details -->
     <div class="col-md-12">
         <form method="post" action="">
             {% csrf_token %}
+            <div class="col-md-12">
+                <h5>Contact Details</h5>
+                <div class="form-inline">
+                    <div class="form-check">
+
+                        <input class="form-check-input" type="radio"
+                               id="callbacktime" value="phone number" required>
+                        <label class="form-check-label" for="exampleRadios1">
+                            Mobile Number
+                        </label>
+                    </div>
+                    <div class="form-check" style="margin-right: 15px;margin-left: 15px;">
+                        <a href="tel: {{ contact.phone_number }}" class="btn btn-primary"
+                           style="text-decoration: none"
+                           id="phoneNumber">
+                            <span class="fas fa-phone-alt"></span> &nbsp;<span>Call</span> </a>
+                    </div>
 
 
-            <br>
-            <h5>Disposition</h5>
-            <div class="form-check">
+                    <div class="form-check dispButtons" style="font-size: 18px">
+                        <input class="form-check-input" value="Status Invalid" style="width:21px; height: 21px;"
+                               type="checkbox" name="wrongNumber"
+                               id="wrongNumber"
+                               onclick="wrong();">
+                        <label class="form-check-label" for="defaultCheck1">
+                            Wrong Number
+                        </label>
+                    </div>
 
-                <input class="form-check-input" type="radio" name="disposition"
-                       onclick="hide(); show_callback('datetime');"
-                       id="callbacktime"
-                       value="Callback">
-                <label class="form-check-label" for="exampleRadios1">
-                    Call Back
-                </label>
-            </div>
-            <div class="col-md-3 form-group" style="display: none" id="datetime">
-                <h6>Callback Date time</h6>
-                <input type="text" id="picker" class="form-control" name="callback_datetime">
-            </div>
+                </div>
 
-            <!-- Appointment-->
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="disposition"
-                       onclick="hide(); show_appointment('appointment_datetime');"
-                       id="appointment"
-                       value="Appointment">
-                <label class="form-check-label" for="exampleRadios1">
-                    Appointment
-                </label>
             </div>
-            <div class="col-md-3 form-group" style="display: none" id="appointment_datetime">
-                <h6>Appointent Date time</h6>
-                <input type="text" id="picker_appointment" class="form-control" name="appointment_datetime">
-            </div>
+            <hr>
+            <div class="col-md-12">
 
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="disposition" onclick="hide(); show_unqualified()"
-                       id="exampleRadios1"
-                       value="Unqualified">
-                <label class="form-check-label" for="exampleRadios1">
-                    Unqualified
-                </label>
-            </div>
-            <div class="col-md-4 form-check" id="show_unqualified" style="display: none;">
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="sub_disposition" id="exampleRadios1"
-                           value="not Interested">
+                <h5 id="dispheading" style="display: block;">Disposition</h5>
+                <div class="form-check" id="dispButons0" style="display: block;">
+
+                    <input class="form-check-input" type="radio" name="disposition"
+                           onclick="hide(); show_callback('datetime');"
+                           id="callbacktime"
+                           value="Callback">
                     <label class="form-check-label" for="exampleRadios1">
-                        Not Interested
+                        Call Back
                     </label>
                 </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="sub_disposition" id="exampleRadios1"
-                           value="Not Eligible">
+                <div class="col-md-3 form-group" style="display: none" id="datetime">
+                    <h6>Callback Date time</h6>
+                    <input type="text" id="picker" class="form-control" name="callback_datetime">
+                </div>
+
+                <!-- Appointment-->
+                <div class="form-check " id="dispButons1" style="display: block;">
+                    <input class="form-check-input" type="radio" name="disposition"
+                           onclick="hide(); show_appointment('appointment_datetime');"
+                           id="appointment"
+                           value="Appointment">
                     <label class="form-check-label" for="exampleRadios1">
-                        Not Eligible
+                        Appointment
                     </label>
                 </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="sub_disposition" id="exampleRadios1"
-                           value="not Reachable">
+                <div class="col-md-3 form-group" style="display: none" id="appointment_datetime">
+                    <h6>Appointent Date time</h6>
+                    <input type="text" id="picker_appointment" class="form-control" name="appointment_datetime">
+                </div>
+
+                <div class="form-check dispButtons" id="dispButons2" style="display: block;">
+                    <input class="form-check-input" type="radio" name="disposition"
+                           onclick="hide(); show_unqualified()"
+                           id="exampleRadios1"
+                           value="Unqualified">
                     <label class="form-check-label" for="exampleRadios1">
-                        Not reachable
+                        Unqualified
                     </label>
                 </div>
-            </div>
+                <div class="col-md-4 form-check" id="show_unqualified" style="display: none;">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="sub_disposition" id="exampleRadios1"
+                               value="not Interested">
+                        <label class="form-check-label" for="exampleRadios1">
+                            Not Interested
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="sub_disposition" id="exampleRadios1"
+                               value="Not Eligible">
+                        <label class="form-check-label" for="exampleRadios1">
+                            Not Eligible
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="sub_disposition" id="exampleRadios1"
+                               value="not Reachable">
+                        <label class="form-check-label" for="exampleRadios1">
+                            Not reachable
+                        </label>
+                    </div>
+                </div>
 
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="disposition" onclick="hide()" id="exampleRadios1"
-                       value="Interested">
-                <label class="form-check-label" for="exampleRadios1">
-                    Interested
-                </label>
-            </div>
+                <div class="form-check dispButtons" id="dispButons3" style="display: block;">
+                    <input class="form-check-input" type="radio" name="disposition" onclick="hide()"
+                           id="exampleRadios1"
+                           value="Interested">
+                    <label class="form-check-label" for="exampleRadios1">
+                        Interested
+                    </label>
+                </div>
 
-            <br>
-            <h5>Remarks</h5>
-            <div class="form-group">
-                <textarea class="form-control" name="remarks" id="exampleFormControlTextarea1" rows="3"></textarea>
+                <br>
+                <h5>Remarks</h5>
+                <div class="form-group">
+                        <textarea class="form-control" name="remarks" id="exampleFormControlTextarea1"
+                                  rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+
             </div>
-            <button type="submit" class="btn btn-primary">Save</button>
         </form>
         <script>
             function hide() {
@@ -127,7 +233,38 @@
                 document.getElementById("show_unqualified").style.display = 'block';
 
             }
+
+            function wrong() {
+                alert('yes');
+                var checkBox = document.getElementById('wrongNumber');
+                if (checkBox.checked == true) {
+                    document.getElementById('phoneNumber').classList.add('disabled');
+                    document.getElementById('phoneNumber').style.textDecoration = 'line-through';
+
+                    document.getElementById('dispheading').style.display = 'none';
+                    document.getElementById('dispButons0').style.display = 'none';
+                    document.getElementById('dispButons1').style.display = 'none';
+                    document.getElementById('dispButons2').style.display = 'none';
+                    document.getElementById('dispButons3').style.display = 'none';
+                    document.getElementById('datetime').style.display = 'none';
+                    document.getElementById('appointment_datetime').style.display = 'none';
+                    document.getElementById('show_unqualified').style.display = 'none';
+                } else {
+                    document.getElementById('phoneNumber').classList.remove('disabled');
+                    document.getElementById('phoneNumber').style.textDecoration = 'none';
+
+                    document.getElementById('dispheading').style.display = 'block';
+                    document.getElementById('dispButons0').style.display = 'block';
+                    document.getElementById('dispButons1').style.display = 'block';
+                    document.getElementById('dispButons2').style.display = 'block';
+                    document.getElementById('dispButons3').style.display = 'block';
+                }
+            }
         </script>
+
     </div>
+
+        </div>
+
 
 {% endblock %}

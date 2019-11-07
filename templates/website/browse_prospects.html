@@ -19,27 +19,29 @@
     <div class="col-md-12">
         <ul class="nav nav-tabs" role="tablist">
             <li class="nav-item">
-                <a class="nav-link" href="detail_campaign">Campaigns</a>
+                <a class="nav-link" href="{% url 'home' %}">Campaigns</a>
             </li>
             {% if request.user.first_name != 'Admin' %}
                 <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#user_detail">User</a>
+                    <a class="nav-link" href="user_detail">User</a>
                 </li>
 
             {% endif %}
             {% if request.user.first_name == 'Admin' %}
                 <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#user">Add User</a>
+                    <a class="nav-link" href="add_campaign_user">Members</a>
                 </li>
             {% endif %}
-
-
-            <li class="nav-item">
-                <a class="nav-link" href="#">Prospect</a>
-
+            <li class="nav-item"></li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">Prospect</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="browse_prospects">Browse</a>
+                    <a class="dropdown-item" href="#">Add New</a>
+                    <a class="dropdown-item" href="prospect">Import</a>
+                </div>
             </li>
         </ul>
-
         <!-- Tab panes -->
         <div class="tab-content">
 
@@ -51,7 +53,8 @@
                         <table class="table table-bordered">
                             <tr>
                                 <th>Name</th>
-
+                                <th>Phone Number</th>
+                                <th>Handler</th>
                                 <th>Status</th>
                                 <th>Follow Up</th>
                                 <th>Remarks</th>
@@ -61,21 +64,25 @@
                                 <tr>
 
                                     <td><a href="/{{ ud.id }}/prospect_detail">{{ ud.name|title }}</a></td>
-{#                                    <td>{{ ud.phone_number }}</td>#}
+                                    <td>{{ ud.phone_number }}</td>
+                                    <td>{{ ud.user_assign }}</td>
                                     <td>{% if ud.disposition != None %}
                                         {{ ud.disposition|title }} &nbsp;
                                     {% endif %}
                                         {% if ud.sub_disposition != None %}
-                                        {{ ud.sub_disposition|title }}
+                                            {{ ud.sub_disposition|title }}
                                         {% endif %}
-                                        </td>
+                                        {% if ud.wrong_number != None %}
+                                            {{ ud.wrong_number|title }}
+                                        {% endif %}
+                                    </td>
                                     <td>{% if ud.appointment_follow_up != None %}
                                         {{ ud.appointment_follow_up|title }}
                                     {% endif %}
                                         {% if ud.callback_follow_up != None %}
-                                        {{ ud.callback_follow_up|title }}
+                                            {{ ud.callback_follow_up|title }}
                                         {% endif %}
-                                        </td>
+                                    </td>
                                     <td>{{ ud.remarks|title }}</td>
 
                                 </tr>

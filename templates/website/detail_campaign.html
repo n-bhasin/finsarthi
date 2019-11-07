@@ -28,16 +28,17 @@
             {% endif %}
             {% if request.user.first_name == 'Admin' %}
                 <li class="nav-item">
-                    <a class="nav-link" href="add_campaign_user">Add User</a>
+                    <a class="nav-link" href="add_campaign_user">Members</a>
                 </li>
             {% endif %}
+            <li class="nav-item"></li>
             <li class="nav-item dropdown">
-                <a class="nav-link" href="browse_prospects">Browse Prospects</a>
-{#                <div class="dropdown-menu">#}
-{#                    <a class="dropdown-item" data-toggle="tab" href="#browse">Browse</a>#}
-{#                    <a class="dropdown-item" data-toggle="tab" href="#">Add New</a>#}
-{#                    <a class="dropdown-item" href="prospect">Import</a>#}
-{#                </div>#}
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">Prospect</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item"  href="browse_prospects">Browse</a>
+                    <a class="dropdown-item"  href="#">Add New</a>
+                    <a class="dropdown-item"  href="prospect">Import</a>
+                </div>
             </li>
         </ul>
 

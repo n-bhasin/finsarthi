@@ -42,19 +42,19 @@ class Contact(models.Model):
 		return '{} {}'.format(self.name, self.phone_number)
 
 	def id(self):
-		for u in self.contact_info.values():
+		for u in self.contact_info.order_by('-id').values():
 			return u['id']
 
 	def disposition(self):
-		for u in self.contact_info.values():
+		for u in self.contact_info.order_by('-id').values():
 			return u['disposition']
 
 	def sub_disposition(self):
-		for u in self.contact_info.values():
+		for u in self.contact_info.order_by('-id').values():
 			return u['sub_disposition']
 
 	def appointment_follow_up(self):
-		for u in self.contact_info.values():
+		for u in self.contact_info.order_by('-id').values():
 			str = u['appointment_follow_up']
 			if str is '':
 				return u['appointment_follow_up']
@@ -67,7 +67,7 @@ class Contact(models.Model):
 				return new_str
 
 	def callback_follow_up(self):
-		for u in self.contact_info.values():
+		for u in self.contact_info.order_by('-id').values():
 			str = u['callback_follow_up']
 			if str is '':
 				return u['callback_follow_up']
@@ -78,12 +78,19 @@ class Contact(models.Model):
 			else:
 				new_str = datetime.strptime(str, '%Y-%m-%d %H:%M')
 				return new_str
+				continue
 
+	def remarks(self):
+		for u in self.contact_info.order_by('-id').values():
+			return u['remarks']
 
-def remarks(self):
-	for u in self.contact_info.values():
-		return u['remarks']
+	def user_assign(self):
+		for u in self.contact_info.order_by('-id').values():
+			return u['user_assign']
 
+	def wrong_number(self):
+		for u in self.contact_info.order_by('-id').values():
+			return u['wrong_number']
 
 CONTACT_STATUS = [
 	('call_back', 'Call Back'),
@@ -95,9 +102,13 @@ CONTACT_STATUS = [
 
 
 class Information(models.Model):
-	disposition = models.CharField(max_length=100, blank=True)
+	wrong_number = models.CharField(max_length=100, blank=True, null=True)
+	disposition = models.CharField(max_length=100, blank=True, null=True)
 	sub_disposition = models.CharField(max_length=100, blank=True, null=True)
 	callback_follow_up = models.CharField(max_length=100, null=True, blank=True)
 	appointment_follow_up = models.CharField(max_length=100, null=True, blank=True)
 	remarks = models.CharField(max_length=1000, blank=True)
+	user_assign = models.CharField(max_length=1000, blank=True)
+	datetime = models.DateTimeField(auto_now_add=True)
 	contact = models.ForeignKey(Contact, on_delete=models.CASCADE, related_name='contact_info', null=True)
+
