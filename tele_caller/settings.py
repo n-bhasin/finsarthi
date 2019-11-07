@@ -123,7 +123,7 @@ USE_TZ = True
 django_heroku.settings(locals())
 
 STATIC_URL = '/static/'
-STATIC_ROOT = "/var/www/example.com/static/"
+STATIC_ROOT = "/var/www/finsarthi.herokuapp.com/static/"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'documents')
 MEDIA_URL = '/documents/'
