@@ -28,28 +28,28 @@
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'home' %}">Campaigns</a>
             </li>
-            {% if request.user.first_name != 'Admin' %}
+            {% if request.user.is_superuser == False %}
                 <li class="nav-item">
-                    <a class="nav-link" href="user_detail">User</a>
+                    <a class="nav-link" href="/{{ new_cont }}/user_detail">User</a>
                 </li>
 
             {% endif %}
             {% if request.user.is_superuser == True %}
                 <li class="nav-item">
-                    <a class="nav-link" href="add_campaign_user">Members</a>
+                    <a class="nav-link" href="/{{ new_cont }}/add_campaign_user">Members</a>
                 </li>
             {% endif %}
             <li class="nav-item"></li>
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">Prospect</a>
                 <div class="dropdown-menu">
-                    <a class="dropdown-item" href="browse_prospects">Browse</a>
+                    <a class="dropdown-item" href="/{{ new_cont }}/browse_prospects">Browse</a>
                     <a class="dropdown-item" href="#">Add New</a>
-                    <a class="dropdown-item" href="prospect">Import</a>
+                    <a class="dropdown-item" href="/{{ new_cont }}/prospect">Import</a>
                 </div>
             </li>
         <li class="nav-item">
-                <a class="nav-link" href="pending_calls">Pending Calls <sup>
+                <a class="nav-link" href="/{{ new_cont }}/pending_calls">Pending Calls <sup>
                     <span style="font-size: 14px" class="badge badge-danger">{{ pending_calls }}</span>
                 </sup>
                 </a>

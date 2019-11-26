@@ -12,23 +12,24 @@
                 </div>
             {% endfor %}
         {% endif %}
-    <td>{% if ud.disposition != None %}
-                        {{ ud.disposition|title }} &nbsp;
-                    {% endif %}
-                        {% if ud.sub_disposition != None %}
-                            {{ ud.sub_disposition|title }}
-                        {% endif %}
-                        {% if ud.wrong_number != None %}
-                            {{ ud.wrong_number|title }}
-                        {% endif %}
-                    </td>
+        <td>{% if ud.disposition != None %}
+            {{ ud.disposition|title }} &nbsp;
+        {% endif %}
+            {% if ud.sub_disposition != None %}
+                {{ ud.sub_disposition|title }}
+            {% endif %}
+            {% if ud.wrong_number != None %}
+                {{ ud.wrong_number|title }}
+            {% endif %}
+        </td>
     </div>
     <div class="col-md-12">
         <ul class="nav nav-tabs" role="tablist">
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'home' %}">Campaigns</a>
             </li>
-            {% if request.user.first_name != 'Admin' %}
+            {% if request.user.is_superuser == False %}
+
                 <li class="nav-item">
                     <a class="nav-link" href="user_detail">User</a>
                 </li>
@@ -218,7 +219,7 @@
                         <textarea class="form-control" name="remarks" id="exampleFormControlTextarea1"
                                   rows="3"></textarea>
                     </div>
-                    <button type="submit" id="btn-next"   name="btn-next" class="btn btn-primary">Save</button>
+                    <button type="submit" id="btn-next" name="btn-next" class="btn btn-primary">Save</button>
 
                 </div>
             </form>
