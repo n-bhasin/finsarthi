@@ -388,7 +388,7 @@ def browse_prospects(request, id):
 	print("id", id)
 	print("pid", pid)
 	print("pid.id", pid.id)
-	fetch_data = Contact.objects.filter(new_cont_id=pid.id).all()
+
 	# fetch_user = User.objects.raw("select username from USER")
 	# print(fetch_user)
 	handler_contacts = Contacts()
@@ -424,10 +424,10 @@ def browse_prospects(request, id):
 			context['hand'] = contact_handler[0]
 	print(contact_handler)
 	context['camp_fetch'] = pid
-	context['fetch_data'] = fetch_data
 	context['handler'] = handler_contacts
-
 	context['pending_calls'] = pending_call_notification(request, int(pid.id))
+	fetch_data = Contact.objects.filter(new_cont_id=pid.id).all()
+	context['fetch_data'] = fetch_data
 	return render(request, 'website/browse_prospects.html', context)
 
 
