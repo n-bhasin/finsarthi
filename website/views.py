@@ -391,36 +391,37 @@ def browse_prospects(request, id):
 	fetch_data = Contact.objects.filter(new_cont_id=pid.id).all()
 	# fetch_user = User.objects.raw("select username from USER")
 	# print(fetch_user)
+	handler_contacts = Contacts()
 	cursor.execute(
 		"select auth_user.username from auth_user inner join website_contact on auth_user.id=website_contact.user_id "
 		"where new_cont_id={0}".format(pid.id))
 	contact_handler = ''
 	for hand in cursor.fetchone():
 		contact_handler = hand
-
-	handler_contacts = Contacts()
-	if request.method == 'POST':
-		form = Contacts(request.POST, None)
-		# handler = request.POST.getlist('handler')
-		# print("handler: ", handler)
-		user = request.POST['user']
-		print("user", user)
-		if form.is_valid():
-			print('yes')
-			Contact.objects.filter(new_cont_id=pid.id).update(user_id=user)
-			messages.success(request, "Handler is assigned succesfully.")
-			return HttpResponseRedirect('browse_prospect')
-		else:
-			print('no')
-		# print(handler)
-		print(user)
-		print(form)
-	context['camp_fetch'] = pid
-	context['fetch_data'] = fetch_data
-	context['handler'] = handler_contacts
-	context['hand'] = contact_handler
-	context['pending_calls'] = pending_call_notification(request, int(pid.id))
-	return render(request, 'website/browse_prospects.html', context)
+	if contact_handler is None:
+		if request.method == 'POST':
+			form = Contacts(request.POST, None)
+			# handler = request.POST.getlist('handler')
+			# print("handler: ", handler)
+			user = request.POST['user']
+			print("user", user)
+			if form.is_valid():
+				print('yes')
+				Contact.objects.filter(new_cont_id=pid.id).update(user_id=user)
+				messages.success(request, "Handler is assigned succesfully.")
+				return HttpResponseRedirect('browse_prospect')
+			else:
+				print('no')
+			# print(handler)
+			print(user)
+			print(form)
+	else:
+		context['camp_fetch'] = pid
+		context['fetch_data'] = fetch_data
+		context['handler'] = handler_contacts
+		context['hand'] = contact_handler
+		context['pending_calls'] = pending_call_notification(request, int(pid.id))
+		return render(request, 'website/browse_prospects.html', context)
 
 
 @login_required(login_url=login_view)
