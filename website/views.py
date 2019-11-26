@@ -75,7 +75,7 @@ def logout_view(request):
 def home(request):
 	context = {}
 	session_user = request.user
-	print(request.user.groups.get())
+
 	if session_user is None:
 		return HttpResponseRedirect(reverse(login_view))
 	else:

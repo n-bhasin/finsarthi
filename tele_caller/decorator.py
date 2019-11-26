@@ -11,7 +11,7 @@ def role_required(allowed_roles=[]):
 			for u in allowed_roles:
 				name = u
 			# print(Group.objects.get())
-			print('groups', request.user.groups.get())
+
 			if request.user.groups.filter(name=name) == allowed_roles:
 				return view_func(request, *args, **kwargs)
 			else:
