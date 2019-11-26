@@ -88,7 +88,7 @@ def home(request):
 
 
 @login_required(login_url=login_view)
-@role_required(allowed_roles='Admin')
+@role_required(allowed_roles='False')
 def add_employee(request):
 	context = {}
 	if request.method == 'POST':
