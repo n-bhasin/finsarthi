@@ -256,7 +256,7 @@ def add_campaign_user(request, id):
 		if request.method == 'POST':
 			user_value = request.POST["camp_user"]
 			# print(user_value)
-			cursor1.execute("select * from website_newcampaign_camp_user "
+			cursor1.execute("select camp_id from website_newcampaign_camp_user "
 			                "where website_newcampaign_camp_user.newcampaign_id={0} AND website_newcampaign_camp_user.user_id={1}".format(
 				camp_id.id, user_value))
 
@@ -483,8 +483,8 @@ def notification(request):
 	cursor1 = connection.cursor()
 	cursor2 = connection.cursor()
 
-	cursor1.execute("select COUNT(status) from website_contact where website_contact.status = 'false'")
-	cursor2.execute("select COUNT(status) from website_contact where website_contact.status = 'true'")
+	cursor1.execute("select COUNT(website_contact.status) from website_contact where website_contact.status = 'false'")
+	cursor2.execute("select COUNT(website_contact.status) from website_contact where website_contact.status = 'true'")
 
 	status_false = ''
 	for status in cursor1.fetchall():
@@ -500,7 +500,7 @@ def pending_calls(request, id):
 
 	cursor = connection.cursor()
 	cursor.execute(
-		"SELECT id, name, phone_number FROM website_contact where website_contact.status IS NULL AND "
+		"SELECT website_contact.id, website_contact.name, website_contact.phone_number FROM website_contact where website_contact.status IS NULL AND "
 		"website_contact.new_cont_id={0} OR website_contact.status=false AND website_contact.new_cont_id={1} "
 		"ORDER BY id ASC ".format(id, id))
 
@@ -532,7 +532,7 @@ def pending_calls_details(request, id):
 	# id here is contact id
 	cursor = connection.cursor()
 	cursor.execute(
-		"select new_cont_id from website_contact where website_contact.id='%s' " % id)
+		"select website_contact.new_cont_id from website_contact where website_contact.id='%s' " % id)
 	new_cont_id = ''
 	for new_cont in cursor.fetchone():
 		context['new_cont'] = new_cont
@@ -639,7 +639,7 @@ def pending_calls_details(request, id):
 def pending_call_notification(request, new_cont):
 	cursor = connection.cursor()
 	cursor.execute(
-		"select COUNT(name) from website_contact where website_contact.status IS NULL AND "
+		"select COUNT(website_contact.name) from website_contact where website_contact.status IS NULL AND "
 		"website_contact.new_cont_id={0} OR website_contact.status=false AND website_contact.new_cont_id={1}".format(
 			new_cont, new_cont))
 
