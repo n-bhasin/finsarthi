@@ -88,7 +88,7 @@ def home(request):
 
 
 @login_required(login_url=login_view)
-@role_required(allowed_roles='False')
+@role_required(allowed_roles=True)
 def add_employee(request):
 	context = {}
 	if request.method == 'POST':
@@ -151,7 +151,7 @@ def edit(request, id):
 	context = {}
 
 	employee = get_object_or_404(User, id=id)
-	if request.user.first_name == 'Admin':
+	if request.user.is_superuser == True:
 
 		if request.method == 'POST':
 			form = EmployeeForm(request.POST, instance=employee)
@@ -174,7 +174,7 @@ def edit(request, id):
 			context['employee_form'] = employee_form
 			return render(request, 'website/edit.html', context)
 
-	elif request.user.first_name == 'Admin' or 'Telecaller' or 'Field Exec' or 'Manager':
+	elif request.user.is_superuser == False:
 		employee_form = UserDetail(request.POST, instance=employee)
 		if request.method == 'POST':
 			if employee_form.is_valid():
@@ -194,7 +194,7 @@ def edit(request, id):
 @login_required(login_url=login_view)
 def delete(request, id):
 	context = {}
-	if request.user.first_name == 'Admin':
+	if request.user.is_superuser == True:
 		employee = get_object_or_404(User, id=id)
 		if request.method == 'POST':
 			employee.delete()
@@ -213,7 +213,7 @@ def delete(request, id):
 def create_campaign(request):
 	context = {}
 	# print(request.user.groups.values().get())
-	if request.user.first_name == 'Admin':
+	if request.user.is_superuser == True:
 		campaign_form = Campaign(request.POST or None)
 
 		if campaign_form.is_valid():
@@ -249,7 +249,7 @@ def add_campaign_user(request, id):
 	context = {}
 	cursor = connection.cursor()
 	cursor1 = connection.cursor()
-	if request.user.first_name == 'Admin':
+	if request.user.is_superuser == True:
 		camp_id = get_object_or_404(NewCampaign, id=id)
 		print("camp user id", camp_id.id)
 		camp_user = CampaignUser(request.POST or None)
@@ -291,7 +291,7 @@ def add_campaign_user(request, id):
 def edit_camp(request, id):
 	cid = get_object_or_404(NewCampaign, id=id)
 	print(cid)
-	if request.user.first_name == 'Admin':
+	if request.user.is_superuser == True:
 		if request.method == 'POST':
 			campaign_form = Campaign(request.POST, instance=cid)
 			if campaign_form.is_valid():
@@ -311,7 +311,7 @@ def edit_camp(request, id):
 def delete_camp(request, id):
 	cid = get_object_or_404(NewCampaign, id=id)
 	print(cid)
-	if request.user.first_name == 'Admin':
+	if request.user.is_superuser == True:
 		if request.method == 'POST':
 			cid.delete()
 			messages.success(request, 'Campaign is deleted.')
