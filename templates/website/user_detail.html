@@ -27,7 +27,7 @@
 
             {% endif %}
 
-            {% if request.user.first_name == 'Admin' %}
+            {% if request.user.is_superuser == True %}
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#user">Add User</a>
                 </li>

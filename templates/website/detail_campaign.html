@@ -26,7 +26,7 @@
                 </li>
 
             {% endif %}
-            {% if request.user.first_name == 'Admin' %}
+            {% if request.user.is_superuser == True %}
                 <li class="nav-item">
                     <a class="nav-link" href="add_campaign_user">Members</a>
                 </li>
