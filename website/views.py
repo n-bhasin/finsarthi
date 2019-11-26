@@ -22,8 +22,7 @@ from tele_caller.decorator import role_required
 
 camp_fetch = NewCampaign.objects.order_by('id').all()
 doc_fetch = Documents.objects.order_by('id').all()
-global fetch_info
-global fetch_data
+
 
 
 # confirm session view
@@ -428,6 +427,7 @@ def browse_prospects(request, id):
 	context['pending_calls'] = pending_call_notification(request, int(pid.id))
 	fetch_data = Contact.objects.filter(new_cont_id=pid.id).all()
 	context['fetch_data'] = fetch_data
+	print(fetch_data)
 	return render(request, 'website/browse_prospects.html', context)
 
 
