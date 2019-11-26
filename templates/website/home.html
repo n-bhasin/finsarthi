@@ -14,13 +14,34 @@
         {% endif %}
     </div>
 
+    <div class="col-md-12">
+        <div class="col-md-12 fade show alert alert-primary">
+
+            <div class="col-md-12">
+                {% for key, value in callback.items %}
+
+                {% endfor %}
+               <div class="col-md-12">
+                    <a href="#">You have {{ callback }} overdue follow up. </a>
+                    </div>
+            </div>
 
 
-        <div class="col-md-12">
-            <a href="{% url 'create_campaign' %}">
-                <button class="btn btn-primary" type="submit">Create New</button>
-            </a>
         </div>
+        {% if messages %}
+            {% for message in messages %}
+
+            {% endfor %}
+        {% endif %}
+    </div>
+
+
+
+    <div class="col-md-12">
+        <a href="{% url 'create_campaign' %}">
+            <button class="btn btn-primary" type="submit">Create New</button>
+        </a>
+    </div>
 
     {#    create campaign button#}
 
@@ -74,7 +95,6 @@
 
                 </div>
             </div>
-
 
 
         </div>

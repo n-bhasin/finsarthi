@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
-{% block title %}Campaign Detail{% endblock %}
-{% block campaignheading %}{{ camp_detail.name }}{% endblock %}
-{% block content %}
+{% block title %}Pending Calls{% endblock %}
+{% block campaignheading %}{{ camp_detail }}{% endblock %}
 
+{% block content %}
     <div class="col-md-12">
         {% if messages %}
             {% for message in messages %}
@@ -12,9 +12,17 @@
                 </div>
             {% endfor %}
         {% endif %}
+        <td>{% if ud.disposition != None %}
+            {{ ud.disposition|title }} &nbsp;
+        {% endif %}
+            {% if ud.sub_disposition != None %}
+                {{ ud.sub_disposition|title }}
+            {% endif %}
+            {% if ud.wrong_number != None %}
+                {{ ud.wrong_number|title }}
+            {% endif %}
+        </td>
     </div>
-
-    <!-- Nav tabs -->
     <div class="col-md-12">
         <ul class="nav nav-tabs" role="tablist">
             <li class="nav-item">
@@ -49,36 +57,28 @@
             </li>
         </ul>
 
-        <!-- Tab panes -->
-        <div class="tab-content">
-            <div id="home" class="container tab-pane active"><br>
-                <h6>Detail</h6>
+        <!-- contact details -->
+        <div class="col-md-12 m-2" style="padding-top: 20px;">
+            <p style="font-size: 22px;">Quick Stats</p>
+            <div class="col-md-12">
+                <p><strong>Calls Available: </strong>{{ pending_calls }}</p>
                 <hr>
-                <div class="col-md-12">
+            </div>
+            <div class="col-md-12 p-2" style="border:1px solid #e0e0e0; background: #dcdcdc;">
 
-                    <strong>Script</strong>
-                    <p>{{ camp_detail.script }}</p>
-                    <strong>Assigned</strong>
-                    <p>{% for n in camp_detail.assign_to.all %}{{ n }},{% endfor %}</p>
-                    <strong>Date</strong>
-                    <p>{{ camp_detail.date }}</p>
-                    <strong>Member</strong>
-                    <p>{% for n in camp_detail.camp_user.all %}{{ n }},{% endfor %}</p>
-                    {% if user.groups.values.get.name == 'Admin' %}
-                        <a href="edit_camp">
-                            <button type="submit" class="btn btn-primary">Edit</button>
-                        </a>
-                        <a href="delete_camp">
-
-                            <button type="submit" class="btn btn-danger">Delete</button>
-                        </a>
-                    {% endif %}
-
-                </div>
+                {% if pending_calls == 0 %}
+                        <button class="btn btn-primary btn-m m-2 disabled">START CALLING</button>
+                {% endif %}
+                {% if pending_calls != 0 %}
+                    <a href="/{{ contact_list }}/pending_calls_details">
+                        <button class="btn btn-primary btn-m m-2 ">START CALLING</button>
+                    </a>
+                {% endif %}
 
             </div>
-
         </div>
+
     </div>
+
 
 {% endblock %}

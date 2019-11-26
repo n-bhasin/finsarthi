@@ -34,9 +34,9 @@ class Documents(models.Model):
 class Contact(models.Model):
 	name = models.CharField(max_length=20, null=True)
 	phone_number = models.CharField(max_length=15, null=True)
+	status = models.BooleanField(default=None, null=True)
 	new_cont = models.ForeignKey(NewCampaign, on_delete=models.CASCADE, null=True, default=1)
-
-	# email = models.EmailField(null=True)
+	user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="contact_handler", null=True)
 
 	def __str__(self):
 		return '{} {}'.format(self.name, self.phone_number)
@@ -84,10 +84,6 @@ class Contact(models.Model):
 		for u in self.contact_info.order_by('-id').values():
 			return u['remarks']
 
-	def user_assign(self):
-		for u in self.contact_info.order_by('-id').values():
-			return u['user_assign']
-
 	def wrong_number(self):
 		for u in self.contact_info.order_by('-id').values():
 			return u['wrong_number']
@@ -105,10 +101,9 @@ class Information(models.Model):
 	wrong_number = models.CharField(max_length=100, blank=True, null=True)
 	disposition = models.CharField(max_length=100, blank=True, null=True)
 	sub_disposition = models.CharField(max_length=100, blank=True, null=True)
-	callback_follow_up = models.CharField(max_length=100, null=True, blank=True)
-	appointment_follow_up = models.CharField(max_length=100, null=True, blank=True)
+	callback_follow_up = models.CharField(max_length=100, null=True)
+	appointment_follow_up = models.CharField(max_length=100, null=True)
 	remarks = models.CharField(max_length=1000, blank=True)
-	user_assign = models.CharField(max_length=1000, blank=True)
 	datetime = models.DateTimeField(auto_now_add=True)
 	contact = models.ForeignKey(Contact, on_delete=models.CASCADE, related_name='contact_info', null=True)
 

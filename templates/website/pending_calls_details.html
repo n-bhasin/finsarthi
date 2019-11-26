@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block campaignheading %}
-
+{{ camp_detail }}
 {% endblock %}
 {% block content %}
     <div class="col-md-12">
@@ -47,6 +47,13 @@
                     <a class="dropdown-item" href="#">Add New</a>
                     <a class="dropdown-item" href="prospect">Import</a>
                 </div>
+            </li>
+        <li class="nav-item">
+                <a class="nav-link" href="pending_calls">Pending Calls <sup>
+                    <span style="font-size: 14px" class="badge badge-danger">{{ pending_calls }}</span>
+                </sup>
+                </a>
+
             </li>
         </ul>
         <div class="col-md-12">
@@ -101,7 +108,7 @@
         <hr>
         <!-- contact details -->
         <div class="col-md-12">
-            <form method="post" action="">
+            <form method="post" action="pending_calls_details">
                 {% csrf_token %}
                 <div class="col-md-12">
                     <h5>Contact Details</h5>
@@ -109,11 +116,11 @@
                     <div class="form-inline">
                         <div class="form-check">
 
-                            <input class="form-check-input" type="radio"
-                                   id="callbacktime" value="phone number" required>
-                            <label class="form-check-label" for="exampleRadios1">
-                                Mobile Number
-                            </label>
+{#                            <input class="form-check-input" type="radio"#}
+{#                                   id="callbacktime" value="phone number" required>#}
+{#                            <label class="form-check-label" for="exampleRadios1">#}
+{#                                Mobile Number#}
+{#                            </label>#}
                         </div>
                         <div class="form-check" style="margin-right: 15px;margin-left: 15px;">
                             <a href="tel:+91{{ contact.phone_number }}" class="btn btn-primary"
@@ -218,12 +225,18 @@
                         <textarea class="form-control" name="remarks" id="exampleFormControlTextarea1"
                                   rows="3"></textarea>
                     </div>
-                    <button type="submit" id="btn-next"   name="btn-next" class="btn btn-primary">Save</button>
+                    <input type="submit" id="btn-next1"   name="btn-next" class="btn btn-primary" value="Save & Next">
+                    <input type="submit" id="btn-stop2"   name="btn-stop" class="btn btn-primary" value="Save & Stop">
+                    <button type="button"  onclick="cancelBtn();" id="btn-cancel3" name="btn-cancel" class="btn btn-primary">Cancel</button>
 
                 </div>
             </form>
             <script>
 
+                function cancelBtn(){
+                    let check = confirm("Are you sure you want to cancel calling?");
+                    if (check == true) window.location.replace('/{{ new_cont }}/pending_calls')
+                }
 
                 function hide() {
                     document.getElementById('datetime').style.display = 'none';

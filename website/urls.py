@@ -16,7 +16,10 @@ urlpatterns = [
 	path('file_upload', views.file_upload, name='file_upload'),
 	path('<int:id>/prospect_detail', views.prospect_detail, name='prospect_detail'),
 	path('<id>/browse_prospects', views.browse_prospects, name='browse_prospects'),
-	# path('browse_prospects', views.browse_prospects, name='browse_prospects'),
+	path('<id>/pending_calls', views.pending_calls, name='pending_calls'),
+	path('<id>/pending_calls_details', views.pending_calls_details, name='pending_calls_details'),
+
+	path('browse_prospects', views.browse_prospects, name='browse_prospects'),
 
 	# employees
 	path('add_employee', views.add_employee, name='add_employee'),

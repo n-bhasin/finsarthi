@@ -12,15 +12,18 @@ from django.contrib import messages
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-
+from django.db import connection
 from .tokens import account_activation_token
 
 from .forms import UserLoginForm, \
-	UploadFile, EmployeeForm, Campaign, CampaignUser, UserDetail
+	UploadFile, EmployeeForm, Campaign, CampaignUser, UserDetail, Contacts
 from .models import Contact, Documents, NewCampaign, Information
+from tele_caller.decorator import role_required
 
 camp_fetch = NewCampaign.objects.order_by('id').all()
 doc_fetch = Documents.objects.order_by('id').all()
+global fetch_info
+global fetch_data
 
 
 # confirm session view
@@ -72,16 +75,20 @@ def logout_view(request):
 def home(request):
 	context = {}
 	session_user = request.user
+	print(request.user.groups.get())
 	if session_user is None:
 		return HttpResponseRedirect(reverse(login_view))
 	else:
 		context['user'] = session_user
 		context['camp_fetch'] = camp_fetch
+		# notification(request, )
+		context['callback'] = notification(request)
 
 		return render(request, 'website/home.html', context)
 
 
 @login_required(login_url=login_view)
+@role_required(allowed_roles='Admin')
 def add_employee(request):
 	context = {}
 	if request.method == 'POST':
@@ -97,6 +104,7 @@ def add_employee(request):
 			user.is_active = False
 
 			user.save()
+
 			form.roleSave()
 			current_site = get_current_site(request)
 			message = render_to_string('acc_activate_email.html', {
@@ -133,7 +141,7 @@ def activate(request, uidb64, token):
 		user.save()
 		login(request, user)
 		messages.success(request, 'Thank you for your email confirmation. Now you can login your account.')
-		return redirect(login_view)
+		return redirect(user_detail)
 	else:
 		return HttpResponse('Activation link is invalid!')
 
@@ -143,7 +151,7 @@ def edit(request, id):
 	context = {}
 
 	employee = get_object_or_404(User, id=id)
-	if request.user.is_superuser:
+	if request.user.first_name == 'Admin':
 
 		if request.method == 'POST':
 			form = EmployeeForm(request.POST, instance=employee)
@@ -166,7 +174,7 @@ def edit(request, id):
 			context['employee_form'] = employee_form
 			return render(request, 'website/edit.html', context)
 
-	elif request.user.is_superuser or 'Telecaller' or 'Field Exec' or 'Manager':
+	elif request.user.first_name == 'Admin' or 'Telecaller' or 'Field Exec' or 'Manager':
 		employee_form = UserDetail(request.POST, instance=employee)
 		if request.method == 'POST':
 			if employee_form.is_valid():
@@ -186,7 +194,7 @@ def edit(request, id):
 @login_required(login_url=login_view)
 def delete(request, id):
 	context = {}
-	if request.user.is_superuser:
+	if request.user.first_name == 'Admin':
 		employee = get_object_or_404(User, id=id)
 		if request.method == 'POST':
 			employee.delete()
@@ -205,7 +213,7 @@ def delete(request, id):
 def create_campaign(request):
 	context = {}
 	# print(request.user.groups.values().get())
-	if request.user.is_superuser:
+	if request.user.first_name == 'Admin':
 		campaign_form = Campaign(request.POST or None)
 
 		if campaign_form.is_valid():
@@ -225,10 +233,13 @@ def create_campaign(request):
 def detail_campaign(request, id):
 	context = {}
 	detail = get_object_or_404(NewCampaign, id=id)
+	fetch_data = Contact.objects.filter(new_cont_id=detail.id).all()
 	session_user = request.user
 
 	context['camp_detail'] = detail
 	context['user'] = session_user
+	context['fetch_data'] = fetch_data
+	context['pending_calls'] = pending_call_notification(request, detail.id)
 	return render(request, 'website/detail_campaign.html', context)
 
 
@@ -236,25 +247,43 @@ def detail_campaign(request, id):
 @login_required(login_url=login_view)
 def add_campaign_user(request, id):
 	context = {}
-	if request.user.is_superuser:
+	cursor = connection.cursor()
+	cursor1 = connection.cursor()
+	if request.user.first_name == 'Admin':
 		camp_id = get_object_or_404(NewCampaign, id=id)
-		camp_user = CampaignUser(request.POST, instance=camp_id)
-		print(camp_user)
+		print("camp user id", camp_id.id)
+		camp_user = CampaignUser(request.POST or None)
 		if request.method == 'POST':
-			print('post')
-			if camp_user.is_valid():
-				print('valid')
-				camp_user.save()
-				messages.success(request, "User is added.")
-				return HttpResponseRedirect('detail_campaign')
+			user_value = request.POST["camp_user"]
+			# print(user_value)
+			cursor1.execute("select * from website_newcampaign_camp_user "
+			                "where website_newcampaign_camp_user.newcampaign_id={0} AND website_newcampaign_camp_user.user_id={1}".format(
+				camp_id.id, user_value))
+
+			if cursor1.fetchone():
+				print('yes')
+				cu = CampaignUser(instance=camp_id)
+				context['camp_user'] = cu
+				context['camp_id'] = camp_id
+				context['pending_calls'] = pending_call_notification(request, camp_id.id)
+				messages.success(request, "User already exist.")
+				return render(request, 'website/add_campaign_user.html', context)
 			else:
-				print('not')
+				cursor.execute(
+					"INSERT INTO website_newcampaign_camp_user(newcampaign_id, user_id) values({0}, {1})".format(
+						camp_id.id,
+						user_value))
+				print(cursor.fetchall())
+				messages.success(request, "User is added.")
+				return HttpResponseRedirect(reverse('detail_campaign', args=[camp_id.id, ]))
+
 		else:
-			print('notvalid')
 			cu = CampaignUser(instance=camp_id)
 			context['camp_user'] = cu
 			context['camp_id'] = camp_id
+			context['pending_calls'] = pending_call_notification(request, camp_id.id)
 			return render(request, 'website/add_campaign_user.html', context)
+
 	return render(request, 'website/home.html', context)
 
 
@@ -262,7 +291,7 @@ def add_campaign_user(request, id):
 def edit_camp(request, id):
 	cid = get_object_or_404(NewCampaign, id=id)
 	print(cid)
-	if request.user.is_superuser:
+	if request.user.first_name == 'Admin':
 		if request.method == 'POST':
 			campaign_form = Campaign(request.POST, instance=cid)
 			if campaign_form.is_valid():
@@ -282,7 +311,7 @@ def edit_camp(request, id):
 def delete_camp(request, id):
 	cid = get_object_or_404(NewCampaign, id=id)
 	print(cid)
-	if request.user.is_superuser:
+	if request.user.first_name == 'Admin':
 		if request.method == 'POST':
 			cid.delete()
 			messages.success(request, 'Campaign is deleted.')
@@ -346,31 +375,62 @@ def prospect(request, id):
 	context['form_upload'] = form_upload
 
 	context['fetch'] = doc_fetch
-	print(doc_fetch)
 	context['camp_id'] = id
-
+	context['pending_calls'] = pending_call_notification(request, id)
 	return render(request, 'website/prospect.html', context)
 
 
 @login_required(login_url=login_view)
 def browse_prospects(request, id):
 	context = {}
+	cursor = connection.cursor()
 	pid = get_object_or_404(NewCampaign, id=id)
+	print("id", id)
+	print("pid", pid)
+	print("pid.id", pid.id)
 	fetch_data = Contact.objects.filter(new_cont_id=pid.id).all()
+	# fetch_user = User.objects.raw("select username from USER")
+	# print(fetch_user)
+	cursor.execute(
+		"select auth_user.username from auth_user inner join website_contact on auth_user.id=website_contact.user_id "
+		"where new_cont_id={0}".format(pid.id))
+	contact_handler = ''
+	for hand in cursor.fetchone():
+		contact_handler = hand
 
-	# print(fetch_data)
+	handler_contacts = Contacts()
+	if request.method == 'POST':
+		form = Contacts(request.POST, None)
+		# handler = request.POST.getlist('handler')
+		# print("handler: ", handler)
+		user = request.POST['user']
+		print("user", user)
+		if form.is_valid():
+			print('yes')
+			Contact.objects.filter(new_cont_id=pid.id).update(user_id=user)
+			messages.success(request, "Handler is assigned succesfully.")
+			return HttpResponseRedirect('browse_prospect')
+		else:
+			print('no')
+		# print(handler)
+		print(user)
+		print(form)
 	context['camp_fetch'] = pid
 	context['fetch_data'] = fetch_data
-
+	context['handler'] = handler_contacts
+	context['hand'] = contact_handler
+	context['pending_calls'] = pending_call_notification(request, int(pid.id))
 	return render(request, 'website/browse_prospects.html', context)
 
 
 @login_required(login_url=login_view)
 def prospect_detail(request, id):
 	context = {}
-
+	# id here is contact id
 	pid = get_object_or_404(Contact, id=id)
-	handler = request.user.username
+	print(id)
+	print(pid.id)
+
 	fetch_info = Information.objects.filter(contact_id=pid.id).order_by('-id').all()
 
 	# Information.objects.create(user_assign=handler)
@@ -386,15 +446,205 @@ def prospect_detail(request, id):
 		callback = request.POST['callback_datetime']
 		appointment_callback = request.POST['appointment_datetime']
 		remark = request.POST['remarks']
-		Information.objects.update_or_create(
+		contact = Information.objects.filter(contact_id=pid.id)
+		print("***", contact)
+		Information.objects.filter(contact_id=pid.id).update_or_create(
 			wrong_number=wrong_number, disposition=disposition, sub_disposition=sub_disposition,
 			callback_follow_up=callback, appointment_follow_up=appointment_callback,
-			remarks=remark, contact_id=pid.id, user_assign=handler
+			remarks=remark, contact_id=pid.id
 		)
+		if disposition == "Interested":
+			# print('yes')
+			Contact.objects.filter(id=pid.id).update(status=True)
+		if disposition == "Unqualified":
+			# print('u')
+			Contact.objects.filter(id=pid.id).update(status=True)
+		if callback != "":
+			# print(callback)
+			# print('cc')
+			Contact.objects.filter(id=pid.id).update(status=False)
+		if appointment_callback != "":
+			# print('ac')
+			Contact.objects.filter(id=pid.id).update(status=False)
+
+		notification(request)
 		messages.success(request, 'Successfully saved')
+
 		return HttpResponseRedirect('prospect_detail')
 
 	else:
 		context['contact'] = pid
 		context['contact_info'] = fetch_info
 		return render(request, 'website/prospect_detail.html', context)
+
+
+def notification(request):
+	# print("pid", pid)
+	cursor1 = connection.cursor()
+	cursor2 = connection.cursor()
+
+	cursor1.execute("select COUNT(status) from website_contact where website_contact.status = 'false'")
+	cursor2.execute("select COUNT(status) from website_contact where website_contact.status = 'true'")
+
+	status_false = ''
+	for status in cursor1.fetchall():
+		status_false = status[0]
+	# print("status: ", status_false)
+	return status_false
+
+
+def pending_calls(request, id):
+	context = {}
+	# id here is contact id
+	name = NewCampaign.objects.filter(id=id).all()
+
+	cursor = connection.cursor()
+	cursor.execute(
+		"SELECT id, name, phone_number FROM website_contact where website_contact.status IS NULL AND "
+		"website_contact.new_cont_id={0} OR website_contact.status=false AND website_contact.new_cont_id={1} "
+		"ORDER BY id ASC ".format(id, id))
+
+	contact_list = []
+	for cid in cursor.fetchall():
+		contact_list.append(cid)
+		# contact_list.append(name)
+		# contact_list.append(phone)
+		print(cid)
+
+	if contact_list is not None:
+		print("m not none")
+		# print(cursor.fetchone())
+
+		print(contact_list)
+		context['contact_list'] = contact_list[0]
+		context['pending_calls'] = pending_call_notification(request, int(id))
+		context['camp_detail'] = name[0]
+
+		return render(request, "website/pending_calls.html", context)
+	else:
+		context['contact_list'] = contact_list
+		context['pending_calls'] = pending_call_notification(request, int(id))
+		return render(request, "website/pending_calls.html", context)
+
+
+def pending_calls_details(request, id):
+	context = {}
+	# id here is contact id
+	cursor = connection.cursor()
+	cursor.execute(
+		"select new_cont_id from website_contact where website_contact.id='%s' " % id)
+	new_cont_id = ''
+	for new_cont in cursor.fetchone():
+		context['new_cont'] = new_cont
+		new_cont_id = new_cont
+	pid = get_object_or_404(Contact, id=id)
+	campaign_name = NewCampaign.objects.filter(id=new_cont_id).all()
+
+	print(id)
+	print(campaign_name)
+
+	fetch_info = Information.objects.filter(contact_id=pid.id).order_by('-id').all()
+	print("**fetch_info", fetch_info)
+	# Information.objects.create(user_assign=handler)
+	# updated_id = Information.objects.filter(user_assign=handler).order_by('-id').first()
+	# print(updated_id.id)
+
+	if request.method == "POST":
+		btn = request.POST.get('btn-next')
+		btnstop = request.POST.get('btn-stop')
+		print("btnn: ", btn)
+		print("btnstop: ", btnstop)
+		if request.POST.get('btn-next'):
+			print("btn-next none")
+			wrong_number = request.POST.get('wrongNumber')
+			print(wrong_number)
+
+			disposition = request.POST.get('disposition')
+			sub_disposition = request.POST.get('unqualified_disposition')
+			callback = request.POST['callback_datetime']
+			appointment_callback = request.POST['appointment_datetime']
+			remark = request.POST['remarks']
+			contact = Information.objects.filter(contact_id=pid.id)
+			print("***", contact)
+			Information.objects.filter(contact_id=pid.id).update_or_create(
+				wrong_number=wrong_number, disposition=disposition, sub_disposition=sub_disposition,
+				callback_follow_up=callback, appointment_follow_up=appointment_callback,
+				remarks=remark, contact_id=pid.id
+			)
+			if disposition == "Interested":
+				# print('yes')
+				Contact.objects.filter(id=pid.id).update(status=True)
+			if disposition == "Unqualified":
+				# print('u')
+				Contact.objects.filter(id=pid.id).update(status=True)
+			if callback != "":
+				# print(callback)
+				# print('cc')
+				Contact.objects.filter(id=pid.id).update(status=False)
+			if appointment_callback != "":
+				# print('ac')
+				Contact.objects.filter(id=pid.id).update(status=False)
+
+			notification(request)
+			messages.success(request, 'Successfully saved')
+
+			new_id = pid.id + 1
+			print(new_id)
+			return HttpResponseRedirect('/%s/pending_calls_details' % new_id)
+		elif request.POST.get('btn-stop'):
+			print("btn-stop")
+			wrong_number = request.POST.get('wrongNumber')
+
+			disposition = request.POST.get('disposition')
+			sub_disposition = request.POST.get('unqualified_disposition')
+			callback = request.POST['callback_datetime']
+			appointment_callback = request.POST['appointment_datetime']
+			remark = request.POST['remarks']
+			contact = Information.objects.filter(contact_id=pid.id)
+			print("***", contact)
+			Information.objects.filter(contact_id=pid.id).update_or_create(
+				wrong_number=wrong_number, disposition=disposition, sub_disposition=sub_disposition,
+				callback_follow_up=callback, appointment_follow_up=appointment_callback,
+				remarks=remark, contact_id=pid.id
+			)
+			if disposition == "Interested":
+				# print('yes')
+				Contact.objects.filter(id=pid.id).update(status=True)
+			if disposition == "Unqualified":
+				# print('u')
+				Contact.objects.filter(id=pid.id).update(status=True)
+			if callback != "":
+				# print(callback)
+				# print('cc')
+				Contact.objects.filter(id=pid.id).update(status=False)
+			if appointment_callback != "":
+				# print('ac')
+				Contact.objects.filter(id=pid.id).update(status=False)
+
+			notification(request)
+			messages.success(request, 'Successfully saved')
+
+			return HttpResponseRedirect('pending_calls_details')
+		else:
+			return HttpResponse('Not valid')
+
+	else:
+		context['contact'] = pid
+		context['contact_info'] = fetch_info
+		context['camp_detail'] = campaign_name[0]
+		context['pending_calls'] = pending_call_notification(request, new_cont_id)
+		return render(request, 'website/pending_calls_details.html', context)
+
+
+def pending_call_notification(request, new_cont):
+	cursor = connection.cursor()
+	cursor.execute(
+		"select COUNT(name) from website_contact where website_contact.status IS NULL AND "
+		"website_contact.new_cont_id={0} OR website_contact.status=false AND website_contact.new_cont_id={1}".format(
+			new_cont, new_cont))
+
+	status_null = ''
+	for status in cursor.fetchall():
+		status_null = status[0]
+		print("status: ", status_null)
+	return status_null

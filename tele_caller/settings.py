@@ -25,7 +25,7 @@ SECRET_KEY = '(h+a)lbpzv9%b)r#u$3zv$=)^o0-%ob=299$vchku=m6$@jx-%'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['finsarthi.herokuapp.com']
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -77,10 +77,10 @@ WSGI_APPLICATION = 'tele_caller.wsgi.application'
 DATABASES = {
 	'default': {
 		'ENGINE': 'django.db.backends.postgresql',
-		'NAME': 'pztxkubj',
-		'USER': 'pztxkubj',
-		'PASSWORD': '24sARXgWkIydZjLBNMoZtDLg0bLrKoQa',
-		'HOST': 'hansken.db.elephantsql.com',
+		'NAME': 'jkjxdbsd',
+		'USER': 'jkjxdbsd',
+		'PASSWORD': 'QXZUEL1d8tDtb-05UOeVMhnO0xruHkhd',
+		'HOST': 'salt.db.elephantsql.com',
 		'PORT': '5432'
 	}
 }
@@ -122,8 +122,10 @@ USE_TZ = True
 # activate django_heroku
 django_heroku.settings(locals())
 
+
+STATIC_ROOT = os.path.join(BASE_DIR, '/static')
+
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'documents')
 MEDIA_URL = '/documents/'

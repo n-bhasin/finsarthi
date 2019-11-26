@@ -56,7 +56,7 @@
                                 <a class="nav-link" href="{% url 'home' %}">Campaign</a>
                             </li>
 
-                            {% if request.user.is_superuser %}
+                            {% if user.groups.values.get.name == 'Admin' %}
                                 <li class="nav-item">
                                     <a class="nav-link" href="{% url 'add_employee' %}">Employee</a>
                                 </li>
@@ -87,6 +87,15 @@
                 <hr>
             </div>
             {% block content %}
+                {% for u in fetch_data %}
+
+                <div class="alert alert-primary" role="alert">
+                    This is a primary alert with <a href="#" class="alert-link">an example link</a>. Give it a click if
+                    you like.
+                {{ u }}
+                </div>
+                {% endfor %}
+
             {% endblock %}
         </div>
 
@@ -109,6 +118,13 @@
         format: 'Y-m-d H:i',
     })
 
+</script>
+<script>
+    $(document).ready(function () {
+        $('#checkAll').click(function () {
+            $(".checkboxSelectAll").attr('checked', true);
+        });
+    })
 </script>
 </body>
 </html>
