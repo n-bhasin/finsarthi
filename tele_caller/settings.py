@@ -122,8 +122,10 @@ USE_TZ = True
 # activate django_heroku
 django_heroku.settings(locals())
 
-
-STATIC_ROOT = os.path.join(BASE_DIR, '/static')
+STATIC_ROOT = [
+	os.path.join(BASE_DIR, "static"),
+	'/var/www/static/',
+]
 
 STATIC_URL = '/static/'
 
