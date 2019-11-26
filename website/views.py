@@ -418,13 +418,15 @@ def browse_prospects(request, id):
 		print(hand)
 		if hand == '':
 			contact_handler = 'Not Assigned'
+			context['hand'] = contact_handler
 		else:
 			contact_handler = hand
+			context['hand'] = contact_handler[0]
 	print(contact_handler)
 	context['camp_fetch'] = pid
 	context['fetch_data'] = fetch_data
 	context['handler'] = handler_contacts
-	context['hand'] = contact_handler
+
 	context['pending_calls'] = pending_call_notification(request, int(pid.id))
 	return render(request, 'website/browse_prospects.html', context)
 
