@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.mail import EmailMessage
+from django.core.paginator import Paginator
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib import messages
 from django.template.loader import render_to_string
@@ -425,8 +426,12 @@ def browse_prospects(request, id):
 	context['camp_fetch'] = pid
 	context['handler'] = handler_contacts
 	context['pending_calls'] = pending_call_notification(request, int(pid.id))
+
 	fetch_data = Contact.objects.filter(new_cont_id=pid.id).all()
-	context['fetch_data'] = fetch_data
+	paginator = Paginator(fetch_data, 10)
+	page = request.GET.get('page')
+	contacts = paginator.get_page(page)
+	context['fetch_data'] = contacts
 	print(fetch_data)
 	return render(request, 'website/browse_prospects.html', context)
 
