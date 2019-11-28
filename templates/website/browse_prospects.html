@@ -61,7 +61,7 @@
                             {% csrf_token %}
                             <input type="hidden" value="{{ camp_fetch.id }}">
 
-                            <table class="table table-bordered table-responsive">
+                            <table class="table table-bordered" style="overflow: scroll;">
                                 <tr>
                                     <th><input type="checkbox" class="form-check" id="checkAll">
                                     </th>
