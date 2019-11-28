@@ -10,8 +10,8 @@ RegisterUser = get_user_model()
 
 # user login form
 class UserLoginForm(forms.Form):
-	username = forms.CharField(max_length=20, widget=forms.TextInput(attrs={'class': 'form-control'}))
-	password = forms.CharField(max_length=20, widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+	username = forms.CharField(max_length=200, widget=forms.TextInput(attrs={'class': 'form-control'}))
+	password = forms.CharField(max_length=200, widget=forms.PasswordInput(attrs={'class': 'form-control'}))
 
 	def clean(self, *args, **kwargs):
 		username = self.cleaned_data.get('username')
@@ -189,4 +189,4 @@ class EmployeeForm(forms.ModelForm):
 class UserDetail(UserCreationForm):
 	class Meta:
 		model = User
-		fields = ('username', 'password1', 'password2')
+		fields = ('username', 'first_name', 'last_name', 'password1', 'password2')

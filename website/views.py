@@ -74,13 +74,18 @@ def logout_view(request):
 def home(request):
 	context = {}
 	session_user = request.user
-
+	print(request.user.id)
+	# cursor = connection.cursor()
+	# cursor.execute("select website_newcampaign.name AS campaignId, website_newcampaign.name AS campaignName from  ")
 	if session_user is None:
 		return HttpResponseRedirect(reverse(login_view))
 	else:
 		context['user'] = session_user
-		context['camp_fetch'] = camp_fetch
-		# notification(request, )
+		camp_data = NewCampaign.objects.filter(camp_user=request.user.id).order_by('id').all()
+		camp_data_admin = NewCampaign.objects.order_by('id').all()
+		context['camp_fetch'] = camp_data
+		context['camp_fetch_admin'] = camp_data_admin
+
 		context['callback'] = notification(request)
 
 		return render(request, 'website/home.html', context)
@@ -139,10 +144,39 @@ def activate(request, uidb64, token):
 		user.is_active = True
 		user.save()
 		login(request, user)
-		messages.success(request, 'Thank you for your email confirmation. Now you can login your account.')
-		return redirect(user_detail)
+		messages.success(request, 'Thank you for your email confirmation. Now you can update your account password.')
+		return redirect('password_set')
 	else:
 		return HttpResponse('Activation link is invalid!')
+
+
+@login_required(login_url=login_view)
+def password_set(request):
+	context = {}
+	if request.method == 'POST':
+		employee_form = UserDetail(request.POST, instance=request.user)
+		print('yes')
+		password1 = request.POST.get('password1')
+		password2 = request.POST.get('password2')
+		print(password1, password2)
+		print(employee_form.errors)
+
+		if employee_form.is_valid():
+			print('valid')
+
+			employee_form.save()
+			messages.success(request, "Password updated successfully")
+			context['employee_form'] = employee_form
+
+			return redirect(home)
+		else:
+			print('yes else')
+			messages.success(request, employee_form.errors)
+			return HttpResponseRedirect(reverse('password_set'))
+	else:
+		employee_form = UserDetail(instance=request.user)
+		context['employee_form'] = employee_form
+		return render(request, 'website/edit.html', context)
 
 
 @login_required(login_url=login_view)
@@ -150,7 +184,8 @@ def edit(request, id):
 	context = {}
 
 	employee = get_object_or_404(User, id=id)
-	if request.user.is_superuser == True:
+
+	if request.user.is_superuser:
 
 		if request.method == 'POST':
 			form = EmployeeForm(request.POST, instance=employee)
@@ -173,14 +208,27 @@ def edit(request, id):
 			context['employee_form'] = employee_form
 			return render(request, 'website/edit.html', context)
 
-	elif request.user.is_superuser == False:
-		employee_form = UserDetail(request.POST, instance=employee)
+	elif request.user.is_superuser is False:
+
 		if request.method == 'POST':
+			employee_form = UserDetail(request.POST, instance=employee)
+			print('yes')
+			password1 = request.POST.get('password1')
+			password2 = request.POST.get('password2')
+			print(password1, password2)
+			print(employee_form.errors)
+
 			if employee_form.is_valid():
+				print('valid')
+
 				employee_form.save()
 				messages.success(request, "User has been edited.")
 				context['employee_form'] = employee_form
 				return render(request, 'website/add_employee.html', context)
+			else:
+				print('yes else')
+				messages.success(request, employee_form.errors)
+				return HttpResponseRedirect(reverse('edit', args=[id, ]))
 		else:
 			employee_form = UserDetail(instance=employee)
 			context['employee_form'] = employee_form
@@ -384,12 +432,7 @@ def browse_prospects(request, id):
 	context = {}
 	cursor = connection.cursor()
 	pid = get_object_or_404(NewCampaign, id=id)
-	print("id", id)
-	print("pid", pid)
-	print("pid.id", pid.id)
 
-	# fetch_user = User.objects.raw("select username from USER")
-	# print(fetch_user)
 	handler_contacts = Contacts()
 	cursor.execute(
 		"select auth_user.username from auth_user inner join website_contact on auth_user.id=website_contact.user_id "
@@ -427,10 +470,13 @@ def browse_prospects(request, id):
 	context['pending_calls'] = pending_call_notification(request, int(pid.id))
 
 	fetch_data = Contact.objects.filter(new_cont_id=pid.id).all()
+	fetch_data_called = Contact.objects.filter(user_id=request.user.id, status=False and True).all()
+
 	paginator = Paginator(fetch_data, 10)
 	page = request.GET.get('page')
 	contacts = paginator.get_page(page)
 	context['fetch_data'] = contacts
+	context['fetch_data_called'] = fetch_data_called
 	print(fetch_data)
 	return render(request, 'website/browse_prospects.html', context)
 
@@ -637,7 +683,7 @@ def pending_calls_details(request, id):
 def calls_overdue(request):
 	context = {}
 
-	overdue_list = Contact.objects.filter(status=False).all()
+	overdue_list = Contact.objects.filter(status=False, user_id=request.user.id).all()
 	context['overdue_calls'] = overdue_list
 	context['notification'] = notification(request)
 	return render(request, 'website/overdue.html', context)
@@ -662,11 +708,18 @@ def notification(request):
 	cursor1 = connection.cursor()
 	cursor2 = connection.cursor()
 
-	cursor1.execute("select COUNT(website_contact.status) from website_contact where website_contact.status = 'false'")
-	cursor2.execute("select COUNT(website_contact.status) from website_contact where website_contact.status = 'true'")
-
-	status_false = ''
-	for status in cursor1.fetchall():
-		status_false = status[0]
-	# print("status: ", status_false)
-	return status_false
+	cursor1.execute("select COUNT(website_contact.status) from website_contact where website_contact.status = 'false' "
+	                "AND website_contact.user_id={0}".format(request.user.id))
+	cursor2.execute("select COUNT(website_contact.status) from website_contact where website_contact.status = 'false'")
+	if request.user.is_superuser:
+		status_false = ''
+		for status in cursor2.fetchall():
+			status_false = status[0]
+		# print("status: ", status_false)
+		return status_false
+	else:
+		status_false = ''
+		for status in cursor1.fetchall():
+			status_false = status[0]
+		# print("status: ", status_false)
+		return status_false

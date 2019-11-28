@@ -10,6 +10,7 @@ urlpatterns = [
 	# path('register', views.register_view, name='register_view'),
 	path('logout', views.logout_view, name='logout_view'),
 	path('home', views.home, name='home'),
+	path('password_set', views.password_set, name='password_set'),
 
 	# csv uploads
 	path('<int:id>/prospect', views.prospect, name='prospect'),
@@ -25,7 +26,7 @@ urlpatterns = [
 	path('add_employee', views.add_employee, name='add_employee'),
 	url(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', views.activate,
 	    name='activate'),
-	path('<id>/edit', views.edit, name='edit'),
+	path('<id>/edit', views.edit, name='edit',),
 	path('<int:id>/delete', views.delete, name='delete'),
 	# campaigns
 	path('create_campaign', views.create_campaign, name='create_campaign'),

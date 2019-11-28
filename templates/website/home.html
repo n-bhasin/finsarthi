@@ -21,9 +21,9 @@
                 {% for key, value in callback.items %}
 
                 {% endfor %}
-               <div class="col-md-12">
+                <div class="col-md-12">
                     <a href="calls_overdue">You have {{ callback }} overdue follow up. </a>
-                    </div>
+                </div>
             </div>
 
 
@@ -36,22 +36,27 @@
     </div>
 
 
+    {% if request.user.is_superuser == True %}
+        <div class="col-md-12">
+            <a href="{% url 'create_campaign' %}">
+                <button class="btn btn-primary" type="submit">Create New</button>
+            </a>
+        </div>
 
-    <div class="col-md-12">
-        <a href="{% url 'create_campaign' %}">
-            <button class="btn btn-primary" type="submit">Create New</button>
-        </a>
-    </div>
+    {% endif %}
 
     {#    create campaign button#}
 
     {#search campaign bar#}
-    <div class="col-md-4 offset-md-8 search-bar mt-30">
-        <form class="form-inline" action="#">
-            <input class="form-control mr-sm-2" type="text" placeholder="Search">
-            <button class="btn btn-primary" type="submit">Search</button>
-        </form>
-    </div>
+    {% if request.user.is_superuser == True %}
+        <div class="col-md-4 offset-md-8 search-bar mt-30">
+            <form class="form-inline" action="#">
+                <input class="form-control mr-sm-2" type="text" placeholder="Search">
+                <button class="btn btn-primary" type="submit">Search</button>
+            </form>
+        </div>
+
+    {% endif %}
 
     <br>
     <!-- Nav tabs -->
@@ -76,6 +81,27 @@
         <!-- Tab panes -->
         <div class="tab-content">
             <div id="home" class="container tab-pane active"><br>
+               {% if request.user.is_superuser == True %}
+                <div class="col-md-6">
+                    <h6>Total {{ camp_fetch_admin.all.count }}</h6>
+                    <table class="table">
+                        <tr>
+                            <th>Name</th>
+                        </tr>
+                        {% for camp in camp_fetch_admin.all %}
+                            <tr>
+
+                                <td><a href="{{ camp.id }}/detail_campaign">{{ camp.name }}
+                                </a></td>
+
+                            </tr>
+                        {% endfor %}
+                    </table>
+
+
+                </div>
+               {% endif %}
+                {% if request.user.is_superuser == False %}
                 <div class="col-md-6">
                     <h6>Total {{ camp_fetch.all.count }}</h6>
                     <table class="table">
@@ -94,6 +120,7 @@
 
 
                 </div>
+               {% endif %}
             </div>
 
 

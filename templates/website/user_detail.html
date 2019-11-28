@@ -20,7 +20,7 @@
                 <a class="nav-link" href="{% url 'home' %}">Campaigns</a>
             </li>
 
-            {% if request.user.first_name != 'Admin' %}
+            {% if request.user.is_superuser == False %}
                 <li class="nav-item">
                     <a class="nav-link" href="user_detail">User</a>
                 </li>
@@ -66,11 +66,11 @@
                                     <td>{{ ud.username }}</td>
                                     <td>{{ ud.email }}</td>
                                     <td>{{ ud.is_active }}</td>
-{#                                    <td>#}
-{#                                        <a href="/{{ ud.id }}/edit">#}
-{#                                            <button type="submit" class="btn btn-danger">Edit</button>#}
-{#                                        </a>#}
-{#                                    </td>#}
+                                    <td>
+                                        <a href="/{{ ud.id }}/edit">
+                                            <button type="submit" class="btn btn-danger">Edit</button>
+                                        </a>
+                                    </td>
                                 </tr>
                             {% endfor %}
 

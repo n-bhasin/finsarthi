@@ -1,13 +1,38 @@
 {% extends 'base.html' %}
 {% block campaignheading %}Users{% endblock %}
 {% block content %}
+    <div class="col-md-12">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="col-sm-12 fade show alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    {{ message|title }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
     <form action="" method="post">
         {% csrf_token %}
+
+        {{ employee_form.errors }}
+        {{ employee_form.non_field_error }}
+        {{ employee_form.non_field_error }}
         {% for u in employee_form %}
             <div class="form-group field">
+                {% for non_field_error in u.non_field_error %}
+                    <p class="help text-danger">{{ non_field_error }}</p>
+                {% endfor %}
+                {% if u.help_text %}
+                    <p class="help">{{ u.non_field_error }}</p>
+                {% endif %}
+
+                {% for error in u.errors %}
+                    <p class="help text-danger">{{ error }}</p>
+                {% endfor %}
                 <label for="{{ u.id_for_label }}"
                        class="label">{{ u.label|title }}</label>
                 {{ u }}
+
             </div>
         {% endfor %}
         <button type="submit" class="btn btn-primary">edit</button>

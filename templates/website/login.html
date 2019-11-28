@@ -43,12 +43,13 @@
         <div class="col-md-3 offset-md-4">
             <form action="{% url 'login_view' %}" method="post">
                 {% csrf_token %}
-                {% for non_field_error in form.non_field_error %}
-                    <p class="help text-danger">{{ non_field_error }}</p>
-                {% endfor %}
+
 
                 {% for field in form %}
                     <div class="form-group field">
+                        {% for non_field_error in form.non_field_error %}
+                            <p class="help text-danger">{{ non_field_error }}</p>
+                        {% endfor %}
                         <label for="{{ field.id_for_label }}" class="label">{{ field.html_name }}</label>
                         {{ field }}
 
@@ -64,7 +65,7 @@
 
                 <button type="submit" class="btn btn-primary">Login</button>
             </form>
-{#            <p><a href="{% url 'register_view' %}">Register</a></p>#}
+            {#            <p><a href="{% url 'register_view' %}">Register</a></p>#}
         </div>
 
     </div>
