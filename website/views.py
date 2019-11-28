@@ -25,7 +25,6 @@ camp_fetch = NewCampaign.objects.order_by('id').all()
 doc_fetch = Documents.objects.order_by('id').all()
 
 
-
 # confirm session view
 def form_view(request):
 	if request.session.has_key('user_session'):
@@ -491,21 +490,6 @@ def prospect_detail(request, id):
 		return render(request, 'website/prospect_detail.html', context)
 
 
-def notification(request):
-	# print("pid", pid)
-	cursor1 = connection.cursor()
-	cursor2 = connection.cursor()
-
-	cursor1.execute("select COUNT(website_contact.status) from website_contact where website_contact.status = 'false'")
-	cursor2.execute("select COUNT(website_contact.status) from website_contact where website_contact.status = 'true'")
-
-	status_false = ''
-	for status in cursor1.fetchall():
-		status_false = status[0]
-	# print("status: ", status_false)
-	return status_false
-
-
 def pending_calls(request, id):
 	context = {}
 	# id here is contact id
@@ -650,6 +634,15 @@ def pending_calls_details(request, id):
 		return render(request, 'website/pending_calls_details.html', context)
 
 
+def calls_overdue(request):
+	context = {}
+
+	overdue_list = Contact.objects.filter(status=False).all()
+	context['overdue_calls'] = overdue_list
+	context['notification'] = notification(request)
+	return render(request, 'website/overdue.html', context)
+
+
 def pending_call_notification(request, new_cont):
 	cursor = connection.cursor()
 	cursor.execute(
@@ -662,3 +655,18 @@ def pending_call_notification(request, new_cont):
 		status_null = status[0]
 		print("status: ", status_null)
 	return status_null
+
+
+def notification(request):
+	# print("pid", pid)
+	cursor1 = connection.cursor()
+	cursor2 = connection.cursor()
+
+	cursor1.execute("select COUNT(website_contact.status) from website_contact where website_contact.status = 'false'")
+	cursor2.execute("select COUNT(website_contact.status) from website_contact where website_contact.status = 'true'")
+
+	status_false = ''
+	for status in cursor1.fetchall():
+		status_false = status[0]
+	# print("status: ", status_false)
+	return status_false

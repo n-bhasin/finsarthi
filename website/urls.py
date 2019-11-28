@@ -35,6 +35,7 @@ urlpatterns = [
 	path('<int:id>/delete_camp', views.delete_camp, name='delete_camp'),
 	# campaign users
 	path('<int:id>/user_detail', views.user_detail, name='user_detail'),
+	path('calls_overdue', views.calls_overdue, name='calls_overdue'),
 
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_URL)
 
