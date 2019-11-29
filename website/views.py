@@ -395,17 +395,18 @@ def file_upload(request):
 			return HttpResponseRedirect(reverse(home))
 		else:
 			if form.is_valid():
-				csv_file = pandas.read_csv(csv_file, header=0)
-				csv_file_list = csv_file.values.tolist()
-				print(csv_file_list)
-				for column in csv_file_list:
-					_, created = Contact.objects.update_or_create(
-						name=column[0],
-						phone_number=column[1],
-						new_cont_id=new_camp_id
-					)
 				doc.new_camp_id = new_camp_id
 				doc.save()
+				# csv_file = pandas.read_csv(csv_file, header=0)
+				# csv_file_list = csv_file.values.tolist()
+				# print(csv_file_list)
+				# for column in csv_file_list:
+				# 	_, created = Contact.objects.update_or_create(
+				# 		name=column[0],
+				# 		phone_number=column[1],
+				# 		new_cont_id=new_camp_id
+				# 	)
+
 				context['csv_file'] = csv_file
 				messages.success(request, "FIle is uploaded")
 				return HttpResponseRedirect('%s/prospect' % new_camp_id)
