@@ -77,10 +77,10 @@ WSGI_APPLICATION = 'tele_caller.wsgi.application'
 DATABASES = {
 	'default': {
 		'ENGINE': 'django.db.backends.postgresql',
-		'NAME': 'pztxkubj',
-		'USER': 'pztxkubj',
-		'PASSWORD': '24sARXgWkIydZjLBNMoZtDLg0bLrKoQa',
-		'HOST': 'hansken.db.elephantsql.com',
+		'NAME': 'dmpsfwgr',
+		'USER': 'dmpsfwgr',
+		'PASSWORD': '0mXMsdE8ynmCkALMsDTumWlWqz1t_fM1',
+		'HOST': 'isilo.db.elephantsql.com',
 		'PORT': '5432'
 	}
 }
