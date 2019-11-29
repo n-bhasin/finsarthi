@@ -120,8 +120,11 @@
                                     <div class="pagination">
                                     <span class="step-links">
                                         {% if fetch_data.has_previous %}
-                                            <a href="?page=1">&laquo; first</a>
-                                            <a href="?page={{ fetch_data.previous_page_number }}">previous</a>
+                                            <a href="?page=1">
+                                            <button type="button" class="btn btn-primary btn-sm">&laquo; first</button>
+                                            </a>
+                                            <a href="?page={{ fetch_data.previous_page_number }}">
+                                            <button type="button" class="btn btn-primary btn-sm">previous</button></a>
                                         {% endif %}
 
                                         <span class="current">
@@ -129,8 +132,13 @@
                                         </span>
 
                                         {% if fetch_data.has_next %}
-                                            <a href="?page={{ fetch_data.next_page_number }}">next</a>
-                                            <a href="?page={{ fetch_data.paginator.num_pages }}">last &raquo;</a>
+                                            <a href="?page={{ fetch_data.next_page_number }}">
+                                            <button type="button" class="btn btn-primary btn-sm">next</button></a>
+                                            </a>
+                                            <a href="?page={{ fetch_data.paginator.num_pages }}">
+
+                                            <button type="button" class="btn btn-primary btn-sm">last &raquo;</button>
+                                            </a>
                                         {% endif %}
                                     </span>
                                     </div>

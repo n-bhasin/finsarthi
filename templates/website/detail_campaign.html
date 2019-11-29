@@ -6,7 +6,7 @@
     <div class="col-md-12">
         {% if messages %}
             {% for message in messages %}
-                <div class="col-sm-3 fade show alert alert-success alert-dismissible">
+                <div class="col-sm-6 fade show alert alert-success alert-dismissible">
                     <button type="button" class="close" data-dismiss="alert">&times;</button>
                     {{ message|title }}
                 </div>
@@ -64,7 +64,7 @@
                     <p>{{ camp_detail.date }}</p>
                     <strong>Member</strong>
                     <p>{% for n in camp_detail.camp_user.all %}{{ n }},{% endfor %}</p>
-                    {% if user.groups.values.get.name == 'Admin' %}
+                    {% if request.user.is_superuser == True %}
                         <a href="edit_camp">
                             <button type="submit" class="btn btn-primary">Edit</button>
                         </a>

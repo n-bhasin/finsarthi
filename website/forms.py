@@ -20,7 +20,7 @@ class UserLoginForm(forms.Form):
 		if username and password:
 			user = authenticate(username=username, password=password)
 			if not user:
-				raise forms.ValidationError("User does not exist.")
+				raise forms.ValidationError("Invalid Username or Password")
 			if not user.check_password:
 				raise forms.ValidationError("Invalid Password.")
 			if not user.is_active:

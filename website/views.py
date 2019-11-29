@@ -58,6 +58,7 @@ def login_view(request):
 			return HttpResponseRedirect(reverse('home'))
 
 	context['form'] = form
+	messages.success(request, form.errors)
 	return render(request, template, context)
 
 
@@ -303,7 +304,7 @@ def add_campaign_user(request, id):
 		if request.method == 'POST':
 			user_value = request.POST["camp_user"]
 			# print(user_value)
-			cursor1.execute("select camp_id from website_newcampaign_camp_user "
+			cursor1.execute("select user_id from website_newcampaign_camp_user "
 			                "where website_newcampaign_camp_user.newcampaign_id={0} AND website_newcampaign_camp_user.user_id={1}".format(
 				camp_id.id, user_value))
 
