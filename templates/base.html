@@ -105,32 +105,32 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js"></script>
-<script src="http://malsup.github.com/jquery.form.js"></script>
-<script>
-    $(document).ready(function () {
-        $('#uploadForm').submit(function (e) {
-            if ($('#id_document').val()) {
-                e.preventDefault()
-
-                $(this).ajaxSubmit({
-                    target: '#targetLayer',
-                    beforeSubmit: function () {
-                        $('.progress-bar').width('0%')
-                    },
-                    uploadProgress: function (event, position, total, percentComplete) {
-                        $('.progress-bar').width(percentComplete + '%')
-                        $('.progress-bar').html("<div id=progress-status>"+percentComplete+"%</div>")
-                    },
-                    success: function () {
-                        $('.progress-bar').width('0%')
-                    },
-                    resetForm: true
-                })
-                return false
-            }
-        })
-    })
-</script>
+{#<script src="http://malsup.github.com/jquery.form.js"></script>#}
+{#<script>#}
+{#    $(document).ready(function () {#}
+{#        $('#uploadForm').submit(function (e) {#}
+{#            if ($('#id_document').val()) {#}
+{#                e.preventDefault()#}
+{##}
+{#                $(this).ajaxSubmit({#}
+{#                    target: '#targetLayer',#}
+{#                    beforeSubmit: function () {#}
+{#                        $('.progress-bar').width('0%')#}
+{#                    },#}
+{#                    uploadProgress: function (event, position, total, percentComplete) {#}
+{#                        $('.progress-bar').width(percentComplete + '%')#}
+{#                        $('.progress-bar').html("<div id=progress-status>"+percentComplete+"%</div>")#}
+{#                    },#}
+{#                    success: function () {#}
+{#                        $('.progress-bar').width('0%')#}
+{#                    },#}
+{#                    resetForm: true#}
+{#                })#}
+{#                return false#}
+{#            }#}
+{#        })#}
+{#    })#}
+{#</script>#}
 
 <script>
     $('#picker').datetimepicker({
