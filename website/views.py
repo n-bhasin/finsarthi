@@ -431,7 +431,7 @@ def prospect(request, id):
 	return render(request, 'website/prospect.html', context)
 
 
-def csv_import(request, data):
+def csv_import(request):
 	context = {}
 
 	if request.method == 'POST':
