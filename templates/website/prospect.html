@@ -100,7 +100,7 @@
                     </thead>
 
                     <tbody>
-                    <form action="/{{ file.id }}/csv_import" method="post">
+                    <form action="/csv_import" method="post">
                         {% csrf_token %}
                         <input type="hidden" value="{{ camp_id }}" name="campId">
                         {% for file in fetch %}
@@ -110,9 +110,10 @@
                                 </a></td>
                                 <td>{{ file.new_camp.name|title }}</td>
                                 <td>{{ file.uploaded_at }}</td>
-                                <td>
-                                    <a href="/{{ file.id }}">
+                                <td><input type="hidden" value="{{ file.id }}" name="fileId">
                                     <input type="submit" class="btn btn-warning btn-sm" value="Import">
+                                    <a href="/{{ file.id }}">
+
                                     </a>
 
                                 </td>
