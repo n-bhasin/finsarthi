@@ -440,7 +440,7 @@ def csv_import(request):
 		new_camp_id = request.POST['campId']
 		file_id = request.POST['fileId']
 		print(file_id)
-		filename = Documents.objects.filter(id=data).all()
+		filename = Documents.objects.filter(id=file_id).all()
 		fetch_file = ''
 		for u in filename:
 			fetch_file = u.document.name
