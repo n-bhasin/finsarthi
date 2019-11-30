@@ -117,6 +117,7 @@
                 url: '/csv_import',
                 dataType: 'text',
                 data: {
+                    campId:$('#camp_id').val(),
                     csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
                 },
                 success: function(){

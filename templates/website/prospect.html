@@ -102,7 +102,7 @@
                     <tbody>
                     <form action="/csv_import" method="post" id="dataSubmit">
                         {% csrf_token %}
-                        <input type="hidden" value="{{ camp_id }}" name="campId">
+                        <input type="hidden" value="{{ camp_id }}" name="campId" id="camp_id">
                         {% for file in fetch %}
                             <tr>
                                 <td><a href="{{ file.document.url }}">
