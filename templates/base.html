@@ -113,7 +113,7 @@
         $('#dataSubmit').submit(function (e) {
             e.preventDefault();
             $.ajax({
-                url: 'csv_import',
+                url: '/csv_import',
                 dataType: 'text',
                 success: function(){
                     alert("yes")
