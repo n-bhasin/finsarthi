@@ -111,7 +111,7 @@
     $(document).ready(function () {
         $('#dataSubmit').submit(function (e) {
             e.preventDefault()
-            $(this).ajax({
+            $.ajax({
                 url: 'csv_import',
                 dataType: 'text',
                 success: function(){
