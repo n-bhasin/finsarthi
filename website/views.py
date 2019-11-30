@@ -410,6 +410,7 @@ def file_upload(request):
 				# 	)
 
 				context['csv_file'] = csv_file
+
 				messages.success(request, "FIle is uploaded")
 				return redirect('%s/prospect' % new_camp_id)
 
@@ -426,6 +427,7 @@ def prospect(request, id):
 	context['form_upload'] = form_upload
 
 	context['fetch'] = doc_fetch
+	print("documents: ", doc_fetch)
 	context['camp_id'] = id
 	context['pending_calls'] = pending_call_notification(request, id)
 	return render(request, 'website/prospect.html', context)
