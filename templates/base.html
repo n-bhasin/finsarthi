@@ -115,8 +115,10 @@
             $.ajax({
                 type: 'POST',
                 url: '/csv_import',
-
                 dataType: 'text',
+                data: {
+                    csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+                },
                 success: function(){
                     alert("yes")
                 }
