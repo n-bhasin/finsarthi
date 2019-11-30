@@ -105,6 +105,21 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#dataSubmit').submit(function (e) {
+            e.preventDefault()
+            $(this).ajax({
+                url: 'csv_import',
+                dataType: 'text',
+                success: function(){
+                    alert("yes")
+                }
+            })
+        })
+    })
+</script>
 {#<script src="http://malsup.github.com/jquery.form.js"></script>#}
 {#<script>#}
 {#    $(document).ready(function () {#}

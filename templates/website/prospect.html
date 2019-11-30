@@ -100,7 +100,7 @@
                     </thead>
 
                     <tbody>
-                    <form action="/csv_import" method="post">
+                    <form action="/csv_import" method="post" id="dataSubmit">
                         {% csrf_token %}
                         <input type="hidden" value="{{ camp_id }}" name="campId">
                         {% for file in fetch %}

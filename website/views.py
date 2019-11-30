@@ -445,7 +445,7 @@ def csv_import(request):
 		for u in filename:
 			fetch_file = u.document.name
 
-		csv_file = pandas.read_csv('documents/' + fetch_file, header=0)
+		csv_file = pandas.read_csv('documents/'+fetch_file, header=0)
 		print(csv_file)
 		csv_file_list = csv_file.values.tolist()
 		print(csv_file_list)
