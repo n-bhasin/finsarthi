@@ -11,6 +11,7 @@ urlpatterns = [
 	path('logout', views.logout_view, name='logout_view'),
 	path('home', views.home, name='home'),
 	path('password_set', views.password_set, name='password_set'),
+	path('<data>csv_import', views.csv_import, name='csv_import'),
 
 	# csv uploads
 	path('<int:id>/prospect', views.prospect, name='prospect'),

@@ -1,3 +1,5 @@
+import os, utils
+
 import requests
 import pandas, random, string
 from django.shortcuts import render, reverse, redirect, get_object_or_404
@@ -13,7 +15,7 @@ from django.contrib import messages
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.db import connection
+from django.db import connection, transaction
 from .tokens import account_activation_token
 
 from .forms import UserLoginForm, \
@@ -409,7 +411,7 @@ def file_upload(request):
 
 				context['csv_file'] = csv_file
 				messages.success(request, "FIle is uploaded")
-				return HttpResponseRedirect('%s/prospect' % new_camp_id)
+				return redirect('%s/prospect' % new_camp_id)
 
 	context["form"] = form
 	return render(request, 'website/prospect.html', context)
@@ -427,6 +429,40 @@ def prospect(request, id):
 	context['camp_id'] = id
 	context['pending_calls'] = pending_call_notification(request, id)
 	return render(request, 'website/prospect.html', context)
+
+
+@transaction.commit_manually
+def csv_import(request, data):
+	context = {}
+
+	if request.method == 'POST':
+		print('post')
+		new_camp_id = request.POST['campId']
+		file_id = request.POST['fileId']
+		print(file_id)
+		filename = Documents.objects.filter(id=data).all()
+		fetch_file = ''
+		for u in filename:
+			fetch_file = u.document.name
+
+		csv_file = pandas.read_csv('documents/' + fetch_file, header=0)
+		print(csv_file)
+		csv_file_list = csv_file.values.tolist()
+		print(csv_file_list)
+		for column in csv_file_list:
+			_, created = Contact.objects.update_or_create(
+				name=column[0],
+				phone_number=column[1],
+				new_cont_id=new_camp_id
+			)
+		transaction.commit()
+		context['csvdata'] = csv_file_list
+		messages.success(request, "data imported")
+		return redirect('%s/prospect' % new_camp_id)
+	else:
+		print('else')
+		messages.success(request, "data importing")
+		return render(request, 'userdetail.html', )
 
 
 @login_required(login_url=login_view)
@@ -725,3 +761,7 @@ def notification(request):
 			status_false = status[0]
 		# print("status: ", status_false)
 		return status_false
+
+
+if __name__ == '__main__':
+	utils.timed(csv_import)
