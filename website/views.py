@@ -15,7 +15,7 @@ from django.contrib import messages
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.db import connection, transaction
+from django.db import connection
 from .tokens import account_activation_token
 
 from .forms import UserLoginForm, \
@@ -431,7 +431,6 @@ def prospect(request, id):
 	return render(request, 'website/prospect.html', context)
 
 
-@transaction.commit_manually
 def csv_import(request, data):
 	context = {}
 
@@ -456,7 +455,6 @@ def csv_import(request, data):
 				phone_number=column[1],
 				new_cont_id=new_camp_id
 			)
-		transaction.commit()
 		context['csvdata'] = csv_file_list
 		messages.success(request, "data imported")
 		end_time = time.time()
