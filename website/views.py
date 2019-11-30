@@ -1,4 +1,4 @@
-import os, utils
+import os, time, timeit
 
 import requests
 import pandas, random, string
@@ -436,6 +436,7 @@ def csv_import(request, data):
 	context = {}
 
 	if request.method == 'POST':
+		strt_time = time.time()
 		print('post')
 		new_camp_id = request.POST['campId']
 		file_id = request.POST['fileId']
@@ -458,6 +459,8 @@ def csv_import(request, data):
 		transaction.commit()
 		context['csvdata'] = csv_file_list
 		messages.success(request, "data imported")
+		end_time = time.time()
+		print("execution time: ", end_time - strt_time)
 		return redirect('%s/prospect' % new_camp_id)
 	else:
 		print('else')
@@ -762,6 +765,3 @@ def notification(request):
 		# print("status: ", status_false)
 		return status_false
 
-
-if __name__ == '__main__':
-	utils.timed(csv_import)
