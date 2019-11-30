@@ -444,6 +444,7 @@ def csv_import(request):
 		fetch_file = ''
 		for u in filename:
 			fetch_file = u.document.name
+			print(fetch_file)
 
 		csv_file = pandas.read_csv('documents/'+fetch_file, header=0)
 		print(csv_file)
