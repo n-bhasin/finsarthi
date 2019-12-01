@@ -384,10 +384,12 @@ def user_detail(request, id):
 def file_upload(request):
 	context = {}
 
-	form = UploadFile(request.POST, request.FILES)
-	print(form)
 	if request.method == 'POST':
+		form = UploadFile(request.POST, request.FILES)
+		print("upload form: ", form)
+
 		csv_file = request.FILES['document']
+		print("cs_file: ", csv_file)
 		new_camp_id = request.POST['campId']
 		doc = form.save(commit=False)
 		print(new_camp_id)
@@ -397,8 +399,10 @@ def file_upload(request):
 			return HttpResponseRedirect(reverse(home))
 		else:
 			if form.is_valid():
+				print("form is valid")
 				doc.new_camp_id = new_camp_id
 				doc.save()
+				print(doc.save())
 				# csv_file = pandas.read_csv(csv_file, header=0)
 				# csv_file_list = csv_file.values.tolist()
 				# print(csv_file_list)
@@ -448,7 +452,7 @@ def csv_import(request):
 			fetch_file = u.document.name
 			print(fetch_file)
 
-		csv_file = pandas.read_csv('documents/'+fetch_file, header=0)
+		csv_file = pandas.read_csv('documents/' + fetch_file, header=0)
 		print(csv_file)
 		csv_file_list = csv_file.values.tolist()
 		print(csv_file_list)
@@ -765,4 +769,3 @@ def notification(request):
 			status_false = status[0]
 		# print("status: ", status_false)
 		return status_false
-
