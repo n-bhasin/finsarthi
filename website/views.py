@@ -401,8 +401,8 @@ def file_upload(request):
 			if form.is_valid():
 				print("form is valid")
 				doc.new_camp_id = new_camp_id
+
 				doc.save()
-				print(doc.save())
 				# csv_file = pandas.read_csv(csv_file, header=0)
 				# csv_file_list = csv_file.values.tolist()
 				# print(csv_file_list)
